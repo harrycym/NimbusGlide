@@ -64,7 +64,7 @@ class MenuBarManager: NSObject {
     }
     
     private func setupStateObserver() {
-        pipeline.pipelineState.$status
+        pipeline.pipelineState?.$status
             .receive(on: RunLoop.main)
             .sink { [weak self] status in
                 self?.handleStatusChange(status)
@@ -85,11 +85,11 @@ class MenuBarManager: NSObject {
             setSymbol("waveform")
             
             // Show a brief checkmark if we just finished processing
-            if pipeline.pipelineState.lastResult != nil {
+            if pipeline.pipelineState?.lastResult != nil {
                 button.contentTintColor = .systemGreen
                 setSymbol("checkmark")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                    if self?.pipeline.pipelineState.status == .idle {
+                    if self?.pipeline.pipelineState?.status == .idle {
                         button.contentTintColor = nil
                         self?.setSymbol("waveform")
                     }

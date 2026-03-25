@@ -5,3 +5,4 @@ FlowX.app/
 *.swp
 .DS_Store
 /tmp/
+Resources/Secrets.plist

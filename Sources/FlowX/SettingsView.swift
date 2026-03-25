@@ -16,6 +16,7 @@ struct SettingsView: View {
 
 private struct GeneralTab: View {
     @EnvironmentObject var settingsManager: SettingsManager
+    @EnvironmentObject var updateChecker: UpdateChecker
     @State private var apiKeyInput: String = ""
 
     var body: some View {
@@ -45,9 +46,46 @@ private struct GeneralTab: View {
             } header: {
                 Text("LLM Model")
             }
+
+            Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Current Version: \(UpdateChecker.currentVersion)")
+                        if let updateNotes = updateChecker.releaseNotes, updateChecker.updateAvailable {
+                            Text(updateNotes).font(.caption).foregroundColor(.secondary)
+                        }
+                    }
+                    Spacer()
+                    Button(updateChecker.updateAvailable ? "Install Update" : "Check for Updates") {
+                        if updateChecker.updateAvailable {
+                            installUpdate()
+                        } else {
+                            updateChecker.checkForUpdate()
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(updateChecker.updateAvailable ? .blue : .secondary)
+                }
+            } header: {
+                Text("Updates")
+            }
         }
         .formStyle(.grouped)
         .padding()
+    }
+
+    private func installUpdate() {
+        let script = """
+        tell application "Terminal"
+            activate
+            do script "cd '/Users/harry/Documents/apps/Cool App (test)/FlowX' && git pull origin main && ./update_app.sh"
+        end tell
+        """
+        if let appleScript = NSAppleScript(source: script) {
+            var errorInfo: NSDictionary?
+            appleScript.executeAndReturnError(&errorInfo)
+        }
+        NSApp.terminate(nil)
     }
 }
 

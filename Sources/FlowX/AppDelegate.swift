@@ -15,7 +15,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let settingsManager = SettingsManager()
     let pipelineState = PipelineState()
     let updateChecker = UpdateChecker()
-    var floatingPillManager: FloatingPillManager!
     var pipeline: FlowXPipeline!
 
     private var cancellables = Set<AnyCancellable>()
