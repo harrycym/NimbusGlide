@@ -84,6 +84,35 @@ struct AppSettingsView: View {
                     .padding(4)
                 }
 
+                // Language
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Language", systemImage: "globe")
+                            .font(.headline)
+
+                        Text("Select which languages the AI may respond in. Pick 1-3 for best results.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 170), alignment: .leading)], spacing: 6) {
+                            ForEach(SettingsManager.supportedLanguages, id: \.self) { language in
+                                Toggle(language, isOn: Binding(
+                                    get: { settingsManager.selectedLanguages.contains(language) },
+                                    set: { isOn in
+                                        if isOn {
+                                            settingsManager.selectedLanguages.append(language)
+                                        } else {
+                                            settingsManager.selectedLanguages.removeAll { $0 == language }
+                                        }
+                                    }
+                                ))
+                                .font(.callout)
+                            }
+                        }
+                    }
+                    .padding(4)
+                }
+
                 // Usage
                 GroupBox {
                     VStack(alignment: .leading, spacing: 8) {

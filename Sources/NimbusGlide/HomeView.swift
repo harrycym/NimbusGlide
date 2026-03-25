@@ -11,6 +11,8 @@ struct HomeView: View {
     @EnvironmentObject var authManager: AuthManager
 
     @State private var showAccessibilityAlert = false
+    @State private var micPulse = false
+    @State private var copiedResult = false
 
     var body: some View {
         ScrollView {
@@ -38,6 +40,12 @@ struct HomeView: View {
                     // Instructional banner
                     instructionalBanner
 
+                    // Mic button + hotkey hint
+                    micButtonSection
+
+                    // Test text area for latest result
+                    resultTextArea
+
                     // Inline dictation history
                     dictationHistory
                 }
@@ -49,6 +57,17 @@ struct HomeView: View {
         .animation(.easeInOut(duration: 0.25), value: pipelineState.errorMessage)
         .animation(.easeInOut(duration: 0.25), value: pipelineState.status)
         .animation(.easeInOut(duration: 0.25), value: pipelineState.isAccessibilityAuthorized)
+        .onChange(of: pipelineState.status) { newStatus in
+            if newStatus == .recording {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                    micPulse = true
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    micPulse = false
+                }
+            }
+        }
         .alert("Accessibility Required", isPresented: $showAccessibilityAlert) {
             Button("Open Settings") {
                 NSWorkspace.shared.open(
@@ -157,6 +176,146 @@ struct HomeView: View {
             NimbusGradients.banner
                 .cornerRadius(NimbusLayout.cardRadius)
         )
+    }
+
+    // MARK: - Mic Button
+
+    private var isRecording: Bool {
+        pipelineState.status == .recording
+    }
+
+    private var micButtonSection: some View {
+        VStack(spacing: 14) {
+            // Big mic button
+            Button(action: {
+                pipelineState.onToggleRecording?()
+            }) {
+                ZStack {
+                    // Outer pulse ring (visible only when recording)
+                    Circle()
+                        .stroke(NimbusColors.recording.opacity(micPulse ? 0.4 : 0), lineWidth: 4)
+                        .frame(width: 100, height: 100)
+                        .scaleEffect(micPulse ? 1.25 : 1.0)
+
+                    // Main circle
+                    Circle()
+                        .fill(
+                            isRecording
+                                ? AnyShapeStyle(NimbusColors.recording)
+                                : AnyShapeStyle(NimbusGradients.primary)
+                        )
+                        .frame(width: 80, height: 80)
+                        .shadow(
+                            color: (isRecording ? NimbusColors.recording : NimbusColors.indigo).opacity(0.35),
+                            radius: micPulse ? 16 : 8,
+                            x: 0, y: 4
+                        )
+
+                    // Mic icon
+                    Image(systemName: isRecording ? "stop.fill" : "mic.fill")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isRecording ? "Stop recording" : "Start recording")
+
+            // Status label
+            Text(isRecording ? "Listening..." : "Tap to dictate")
+                .font(.callout.weight(.medium))
+                .foregroundColor(isRecording ? NimbusColors.recording : NimbusColors.muted)
+
+            // Hotkey hint
+            HStack(spacing: 4) {
+                Text("or hold")
+                    .font(.caption)
+                    .foregroundColor(NimbusColors.muted)
+
+                Text(hotkeyDisplay)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(NimbusColors.heading)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(NimbusColors.sidebarBg)
+                    .cornerRadius(6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(NimbusColors.muted.opacity(0.3), lineWidth: 1)
+                    )
+
+                Text("to dictate")
+                    .font(.caption)
+                    .foregroundColor(NimbusColors.muted)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - Result Text Area
+
+    private var resultTextArea: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Latest Result")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(NimbusColors.muted)
+                    .tracking(0.5)
+
+                Spacer()
+
+                if pipelineState.lastResult != nil {
+                    Button(action: copyResult) {
+                        HStack(spacing: 4) {
+                            Image(systemName: copiedResult ? "checkmark" : "doc.on.doc")
+                                .font(.caption2)
+                            Text(copiedResult ? "Copied" : "Copy")
+                                .font(.caption)
+                        }
+                        .foregroundColor(copiedResult ? NimbusColors.ready : NimbusColors.indigo)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: NimbusLayout.cardRadius)
+                    .fill(NimbusColors.cardBg)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: NimbusLayout.cardRadius)
+                            .stroke(
+                                isRecording
+                                    ? NimbusColors.recording.opacity(0.4)
+                                    : NimbusColors.muted.opacity(0.2),
+                                lineWidth: 1
+                            )
+                    )
+
+                if let result = pipelineState.lastResult, !result.isEmpty {
+                    Text(result)
+                        .font(.body)
+                        .foregroundColor(NimbusColors.heading)
+                        .textSelection(.enabled)
+                        .padding(14)
+                } else {
+                    Text("Your text will appear here...")
+                        .font(.body)
+                        .foregroundColor(NimbusColors.muted.opacity(0.6))
+                        .padding(14)
+                }
+            }
+            .frame(minHeight: 80, alignment: .topLeading)
+        }
+        .nimbusCard()
+        .padding(16)
+    }
+
+    private func copyResult() {
+        guard let text = pipelineState.lastResult else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        copiedResult = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedResult = false }
     }
 
     // MARK: - Dictation History (inline)

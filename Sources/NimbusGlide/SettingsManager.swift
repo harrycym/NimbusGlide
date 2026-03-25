@@ -26,6 +26,7 @@ class SettingsManager: ObservableObject {
     private static let customKeyLabelKey = "nimbusglide_custom_key_label"
     private static let autoCopyKey       = "nimbusglide_auto_copy"
     private static let statusIndicatorKey = "nimbusglide_status_indicator"
+    private static let languagesKey       = "nimbusglide_languages"
 
     @Published var llmModel: String {
         didSet { UserDefaults.standard.set(llmModel, forKey: Self.llmModelKey) }
@@ -55,6 +56,20 @@ class SettingsManager: ObservableObject {
         didSet { UserDefaults.standard.set(showStatusIndicator, forKey: Self.statusIndicatorKey) }
     }
 
+    /// Languages the LLM is allowed to respond in
+    @Published var selectedLanguages: [String] {
+        didSet { UserDefaults.standard.set(selectedLanguages, forKey: Self.languagesKey) }
+    }
+
+    static let supportedLanguages: [String] = [
+        "English", "Spanish", "French", "German", "Italian", "Portuguese",
+        "Dutch", "Russian", "Chinese (Simplified)", "Chinese (Traditional)",
+        "Japanese", "Korean", "Arabic", "Hindi", "Turkish", "Vietnamese",
+        "Thai", "Indonesian", "Polish", "Ukrainian", "Czech", "Romanian",
+        "Swedish", "Danish", "Norwegian", "Finnish", "Greek", "Hebrew",
+        "Hungarian", "Bengali", "Tamil", "Malay"
+    ]
+
     init() {
         let savedModel = UserDefaults.standard.string(forKey: Self.llmModelKey) ?? ""
         if savedModel == "llama-3.1-8b-instant" || savedModel.isEmpty {
@@ -74,6 +89,7 @@ class SettingsManager: ObservableObject {
         self.customKeyLabel = UserDefaults.standard.string(forKey: Self.customKeyLabelKey) ?? "—"
         self.autoCopyToClipboard = UserDefaults.standard.object(forKey: Self.autoCopyKey) as? Bool ?? false
         self.showStatusIndicator = UserDefaults.standard.object(forKey: Self.statusIndicatorKey) as? Bool ?? true
+        self.selectedLanguages = UserDefaults.standard.stringArray(forKey: Self.languagesKey) ?? ["English"]
     }
 
 }

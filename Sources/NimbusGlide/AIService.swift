@@ -173,6 +173,15 @@ class AIService {
             }
         }
 
+        // Language directive
+        let langs = settingsManager.selectedLanguages
+        if langs.count == 1 {
+            prompt += "\n\nIMPORTANT: You MUST respond ONLY in \(langs[0]). Do not use any other language."
+        } else if langs.count >= 2 && langs.count <= 3 {
+            let langList = langs.joined(separator: ", ")
+            prompt += "\n\nIMPORTANT: You MUST respond ONLY in one of these languages: \(langList). Choose the one that matches the speaker's input language. Do not use any other language."
+        }
+
         return prompt
     }
 }
