@@ -74,6 +74,20 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "$ZIP_PATH"
 ZIP_SIZE=$(stat -f%z "$ZIP_PATH")
 echo "==> Created $ZIP_PATH ($ZIP_SIZE bytes)"
 
+# Sign the zip with Sparkle's EdDSA key (key is in macOS Keychain)
+SIGN_TOOL=$(find "$SCRIPT_DIR/.build" -name "sign_update" -type f 2>/dev/null | head -1)
+ED_SIGNATURE=""
+if [ -n "$SIGN_TOOL" ]; then
+    ED_SIGNATURE=$("$SIGN_TOOL" "$ZIP_PATH" 2>/dev/null | grep -o 'sparkle:edSignature="[^"]*"' | sed 's/sparkle:edSignature="//;s/"//' || true)
+    if [ -n "$ED_SIGNATURE" ]; then
+        echo "==> Signed with EdDSA: ${ED_SIGNATURE:0:20}..."
+    else
+        echo "WARNING: Could not sign update. Sparkle will reject this update."
+    fi
+else
+    echo "WARNING: sign_update tool not found. Sparkle will reject this update."
+fi
+
 # Update appcast.xml
 PUBDATE=$(date -u '+%a, %d %b %Y %H:%M:%S +0000')
 cat > "$SCRIPT_DIR/appcast.xml" << APPCAST
@@ -95,6 +109,7 @@ cat > "$SCRIPT_DIR/appcast.xml" << APPCAST
         url="https://github.com/harrycym/NimbusGlide/releases/download/v$VERSION/NimbusGlide.zip"
         length="$ZIP_SIZE"
         type="application/octet-stream"
+        sparkle:edSignature="$ED_SIGNATURE"
       />
     </item>
   </channel>

@@ -15,9 +15,20 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.1</string>
+	<string>1.1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.nimbusglide.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>nimbusglide</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1.0.1</string>
+	<string>1.1.0</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
@@ -32,16 +43,5 @@
 	<string>https://raw.githubusercontent.com/harrycym/NimbusGlide/main/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>wNA1NzwwYXjqTttgcRyfGIIKPaB1H3IECiXTxOxJTss=</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>nimbusglide</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string>com.nimbusglide.app</string>
-		</dict>
-	</array>
 </dict>
 </plist>
