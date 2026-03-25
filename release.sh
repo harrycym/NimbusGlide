@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="FlowX"
+APP_NAME="NimbusGlide"
 APP_BUNDLE="$SCRIPT_DIR/$APP_NAME.app"
 
 # Get version from argument or prompt
@@ -15,14 +15,14 @@ fi
 
 NOTES="${2:-New release}"
 
-echo "==> Building FlowX v$VERSION..."
+echo "==> Building NimbusGlide v$VERSION..."
 
 # Update version in Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$SCRIPT_DIR/Resources/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$SCRIPT_DIR/Resources/Info.plist"
 
 # Update version in UpdateChecker.swift
-sed -i '' "s/static let currentVersion = \".*\"/static let currentVersion = \"$VERSION\"/" "$SCRIPT_DIR/Sources/FlowX/UpdateChecker.swift"
+sed -i '' "s/static let currentVersion = \".*\"/static let currentVersion = \"$VERSION\"/" "$SCRIPT_DIR/Sources/NimbusGlide/UpdateChecker.swift"
 
 # Build
 cd "$SCRIPT_DIR"
@@ -57,7 +57,7 @@ if [ -n "$SPARKLE_PATH" ]; then
 fi
 
 # Sign
-SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "FlowX Dev" | head -1 | awk -F'"' '{print $2}')
+SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "NimbusGlide Dev" | head -1 | awk -F'"' '{print $2}')
 if [ -n "$SIGN_IDENTITY" ]; then
     codesign --force --deep --sign "$SIGN_IDENTITY" --entitlements "$SCRIPT_DIR/$APP_NAME.entitlements" "$APP_BUNDLE"
     echo "==> Signed with $SIGN_IDENTITY"
@@ -67,7 +67,7 @@ else
 fi
 
 # Create zip for distribution
-ZIP_PATH="$SCRIPT_DIR/FlowX.zip"
+ZIP_PATH="$SCRIPT_DIR/NimbusGlide.zip"
 rm -f "$ZIP_PATH"
 cd "$SCRIPT_DIR"
 ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "$ZIP_PATH"
@@ -80,19 +80,19 @@ cat > "$SCRIPT_DIR/appcast.xml" << APPCAST
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>FlowX Updates</title>
-    <link>https://raw.githubusercontent.com/harrycym/FlowX/main/appcast.xml</link>
-    <description>FlowX update feed</description>
+    <title>NimbusGlide Updates</title>
+    <link>https://raw.githubusercontent.com/harrycym/NimbusGlide/main/appcast.xml</link>
+    <description>NimbusGlide update feed</description>
     <language>en</language>
     <item>
-      <title>FlowX $VERSION</title>
+      <title>NimbusGlide $VERSION</title>
       <description><![CDATA[<p>$NOTES</p>]]></description>
       <pubDate>$PUBDATE</pubDate>
       <sparkle:version>$VERSION</sparkle:version>
       <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/harrycym/FlowX/releases/download/v$VERSION/FlowX.zip"
+        url="https://github.com/harrycym/NimbusGlide/releases/download/v$VERSION/NimbusGlide.zip"
         length="$ZIP_SIZE"
         type="application/octet-stream"
       />
@@ -109,10 +109,10 @@ git push origin main
 
 # Create GitHub release with the zip
 gh release create "v$VERSION" "$ZIP_PATH" \
-    --title "FlowX v$VERSION" \
+    --title "NimbusGlide v$VERSION" \
     --notes "$NOTES"
 
 echo ""
-echo "==> Released FlowX v$VERSION!"
-echo "    GitHub: https://github.com/harrycym/FlowX/releases/tag/v$VERSION"
+echo "==> Released NimbusGlide v$VERSION!"
+echo "    GitHub: https://github.com/harrycym/NimbusGlide/releases/tag/v$VERSION"
 echo "    Users will be notified automatically via Sparkle."

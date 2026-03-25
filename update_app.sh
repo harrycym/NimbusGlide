@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="FlowX"
+APP_NAME="NimbusGlide"
 APP_BUNDLE="$SCRIPT_DIR/$APP_NAME.app"
 INSTALL_PATH="/Applications/$APP_NAME.app"
 
@@ -56,8 +56,8 @@ fi
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP_BUNDLE/Contents/MacOS/$APP_NAME" 2>/dev/null || true
 
 if [ -f "$SCRIPT_DIR/$APP_NAME.entitlements" ]; then
-    # Use stable "FlowX Dev" identity if available, otherwise fall back to ad-hoc
-    SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "FlowX Dev" | head -1 | awk -F'"' '{print $2}')
+    # Use stable "NimbusGlide Dev" identity if available, otherwise fall back to ad-hoc
+    SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "NimbusGlide Dev" | head -1 | awk -F'"' '{print $2}')
     if [ -n "$SIGN_IDENTITY" ]; then
         codesign --force --deep --sign "$SIGN_IDENTITY" --entitlements "$SCRIPT_DIR/$APP_NAME.entitlements" "$APP_BUNDLE"
         echo "==> Signed with $SIGN_IDENTITY (stable identity)"

@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-class FlowXPipeline {
+class NimbusGlidePipeline {
     private let audioRecorder: AudioRecorder
     private let aiService: AIService
     private let appTracker: AppTracker
@@ -14,7 +14,7 @@ class FlowXPipeline {
     var pipelineState: PipelineState?
     var settingsManager: SettingsManager?
 
-    /// Tracks the last non-FlowX frontmost app (for manual record button)
+    /// Tracks the last non-NimbusGlide frontmost app (for manual record button)
     private var lastExternalApp: String = "Unknown"
 
     init(
@@ -43,13 +43,13 @@ class FlowXPipeline {
 
     func startRecording() {
         guard !isProcessing else {
-            print("[FlowX] Already processing, ignoring record request")
+            print("[NimbusGlide] Already processing, ignoring record request")
             return
         }
 
-        // Capture frontmost app before FlowX potentially takes focus
+        // Capture frontmost app before NimbusGlide potentially takes focus
         let currentApp = appTracker.frontmostAppName()
-        if currentApp != "FlowX" {
+        if currentApp != "NimbusGlide" {
             lastExternalApp = currentApp
         }
 
@@ -65,7 +65,7 @@ class FlowXPipeline {
 
     func stopRecordingAndProcess() {
         guard let recordingURL = audioRecorder.stopRecording() else {
-            print("[FlowX] No recording to process")
+            print("[NimbusGlide] No recording to process")
             menuBarManager?.setRecordingIndicator(false)
             menuBarManager?.updateStatus("Ready")
             DispatchQueue.main.async {
@@ -83,19 +83,19 @@ class FlowXPipeline {
             self.pipelineState?.status = .processing
         }
 
-        // Use the last external app if FlowX is frontmost (manual record button case)
+        // Use the last external app if NimbusGlide is frontmost (manual record button case)
         let currentApp = appTracker.frontmostAppName()
-        let activeApp = (currentApp == "FlowX") ? lastExternalApp : currentApp
+        let activeApp = (currentApp == "NimbusGlide") ? lastExternalApp : currentApp
         let profileInstructions = profileManager.activeProfile?.instructions
         let memoryExamples = memoryManager.recentExamples()
 
         Task {
             do {
                 let transcript = try await aiService.transcribeAudio(fileURL: recordingURL)
-                print("[FlowX] Transcript: \(transcript)")
+                print("[NimbusGlide] Transcript: \(transcript)")
 
                 guard !transcript.isEmpty else {
-                    print("[FlowX] Empty transcript, skipping")
+                    print("[NimbusGlide] Empty transcript, skipping")
                     await finish(status: .idle)
                     return
                 }
@@ -106,10 +106,10 @@ class FlowXPipeline {
                     profileInstructions: profileInstructions,
                     memoryExamples: memoryExamples
                 )
-                print("[FlowX] Result: \(result)")
+                print("[NimbusGlide] Result: \(result)")
 
                 guard !result.isEmpty else {
-                    print("[FlowX] Empty LLM result, skipping")
+                    print("[NimbusGlide] Empty LLM result, skipping")
                     await finish(status: .idle)
                     return
                 }
@@ -136,7 +136,7 @@ class FlowXPipeline {
                 await finish(status: .idle)
 
             } catch {
-                print("[FlowX] Pipeline error: \(error.localizedDescription)")
+                print("[NimbusGlide] Pipeline error: \(error.localizedDescription)")
                 await MainActor.run {
                     pipelineState?.status = .error
                     pipelineState?.errorMessage = error.localizedDescription

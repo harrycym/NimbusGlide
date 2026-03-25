@@ -4,7 +4,7 @@ import Combine
 
 class MenuBarManager: NSObject, NSMenuDelegate {
     private var statusItem: NSStatusItem!
-    private let pipeline: FlowXPipeline
+    private let pipeline: NimbusGlidePipeline
     private let settingsManager: SettingsManager
     private let profileManager: ProfileManager
     var updateChecker: UpdateChecker?
@@ -15,7 +15,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
     private var animationTimer: Timer?
     private var animationFrame = 0
 
-    init(pipeline: FlowXPipeline, settingsManager: SettingsManager, profileManager: ProfileManager) {
+    init(pipeline: NimbusGlidePipeline, settingsManager: SettingsManager, profileManager: ProfileManager) {
         self.pipeline = pipeline
         self.settingsManager = settingsManager
         self.profileManager = profileManager
@@ -29,12 +29,12 @@ class MenuBarManager: NSObject, NSMenuDelegate {
 
         if let button = statusItem.button {
             let config = NSImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
-            button.image = NSImage(systemSymbolName: "waveform", accessibilityDescription: "FlowX")?.withSymbolConfiguration(config)
+            button.image = NSImage(systemSymbolName: "waveform", accessibilityDescription: "NimbusGlide")?.withSymbolConfiguration(config)
         }
 
         let menu = NSMenu()
 
-        let statusMenuItem = NSMenuItem(title: "FlowX — Ready", action: nil, keyEquivalent: "")
+        let statusMenuItem = NSMenuItem(title: "NimbusGlide — Ready", action: nil, keyEquivalent: "")
         statusMenuItem.isEnabled = false
         menu.addItem(statusMenuItem)
         menu.addItem(NSMenuItem.separator())
@@ -65,8 +65,8 @@ class MenuBarManager: NSObject, NSMenuDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        // Show FlowX
-        let showWindowItem = NSMenuItem(title: "Show FlowX", action: #selector(showMainWindow), keyEquivalent: "o")
+        // Show NimbusGlide
+        let showWindowItem = NSMenuItem(title: "Show NimbusGlide", action: #selector(showMainWindow), keyEquivalent: "o")
         showWindowItem.image = NSImage(systemSymbolName: "macwindow", accessibilityDescription: nil)
         showWindowItem.target = self
         menu.addItem(showWindowItem)
@@ -84,7 +84,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
         menu.addItem(updateItem)
 
         // About
-        let aboutItem = NSMenuItem(title: "About FlowX", action: #selector(showAbout), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: "About NimbusGlide", action: #selector(showAbout), keyEquivalent: "")
         aboutItem.image = NSImage(systemSymbolName: "info.circle", accessibilityDescription: nil)
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -92,7 +92,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
         menu.addItem(NSMenuItem.separator())
 
         // Quit
-        let quitItem = NSMenuItem(title: "Quit FlowX", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "Quit NimbusGlide", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.image = NSImage(systemSymbolName: "power", accessibilityDescription: nil)
         quitItem.target = self
         menu.addItem(quitItem)
@@ -169,7 +169,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
     
     private func setSymbol(_ name: String) {
         let config = NSImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
-        statusItem.button?.image = NSImage(systemSymbolName: name, accessibilityDescription: "FlowX")?.withSymbolConfiguration(config)
+        statusItem.button?.image = NSImage(systemSymbolName: name, accessibilityDescription: "NimbusGlide")?.withSymbolConfiguration(config)
     }
 
     func menuWillOpen(_ menu: NSMenu) {
@@ -205,7 +205,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
     }
 
     @objc private func showMainWindow() {
-        if let window = NSApp.windows.first(where: { $0.title == "FlowX" }) {
+        if let window = NSApp.windows.first(where: { $0.title == "NimbusGlide" }) {
             window.makeKeyAndOrderFront(nil)
         } else if let url = URL(string: "flowx://main") {
             NSWorkspace.shared.open(url)
@@ -234,7 +234,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
 
     @objc private func showAbout() {
         let alert = NSAlert()
-        alert.messageText = "FlowX"
+        alert.messageText = "NimbusGlide"
         alert.informativeText = "Version 1.0\n\nAI-powered voice dictation for macOS."
         alert.alertStyle = .informational
         alert.runModal()
@@ -245,7 +245,7 @@ class MenuBarManager: NSObject, NSMenuDelegate {
     // Left for backwards compatibility if Pipeline calls it directly
     func updateStatus(_ text: String) {
         if let menu = statusItem.menu, let firstItem = menu.items.first {
-            firstItem.title = "FlowX — \(text)"
+            firstItem.title = "NimbusGlide — \(text)"
         }
     }
     func setRecordingIndicator(_ recording: Bool) { /* Stubbed: Handled by StateObserver now */ }

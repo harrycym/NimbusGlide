@@ -22,7 +22,7 @@ struct PermissionsManager {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         let trusted = AXIsProcessTrustedWithOptions(options)
         if !trusted {
-            print("[FlowX] Accessibility access not granted. Please enable it in System Settings > Privacy & Security > Accessibility.")
+            print("[NimbusGlide] Accessibility access not granted. Please enable it in System Settings > Privacy & Security > Accessibility.")
         }
     }
 

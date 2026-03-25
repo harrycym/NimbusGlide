@@ -41,7 +41,7 @@ class HotkeyManager {
         didSet {
             isKeyDown = false
             setupMonitors()
-            print("[FlowX] Hotkey changed to: \(hotkey.rawValue)")
+            print("[NimbusGlide] Hotkey changed to: \(hotkey.rawValue)")
         }
     }
     var customKeyCode: UInt16 = 0
@@ -87,7 +87,7 @@ class HotkeyManager {
             }
         }
 
-        print("[FlowX] Hotkey listener active: \(hotkey.rawValue)")
+        print("[NimbusGlide] Hotkey listener active: \(hotkey.rawValue)")
     }
 
     private func handleKeyEvent(_ event: NSEvent) {

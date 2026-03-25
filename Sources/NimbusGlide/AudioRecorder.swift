@@ -7,7 +7,7 @@ class AudioRecorder: NSObject {
     private(set) var lastRecordingURL: URL?
 
     private var recordingDirectory: URL {
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("FlowX", isDirectory: true)
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("NimbusGlide", isDirectory: true)
         try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         return tempDir
     }
@@ -33,9 +33,9 @@ class AudioRecorder: NSObject {
             isRecording = true
             lastRecordingURL = url
             playStartSound()
-            print("[FlowX] Recording started: \(url.lastPathComponent)")
+            print("[NimbusGlide] Recording started: \(url.lastPathComponent)")
         } catch {
-            print("[FlowX] Failed to start recording: \(error.localizedDescription)")
+            print("[NimbusGlide] Failed to start recording: \(error.localizedDescription)")
         }
     }
 
@@ -45,7 +45,7 @@ class AudioRecorder: NSObject {
         recorder.stop()
         isRecording = false
         playStopSound()
-        print("[FlowX] Recording stopped: \(lastRecordingURL?.lastPathComponent ?? "unknown")")
+        print("[NimbusGlide] Recording stopped: \(lastRecordingURL?.lastPathComponent ?? "unknown")")
         return lastRecordingURL
     }
 
@@ -67,7 +67,7 @@ class AudioRecorder: NSObject {
 extension AudioRecorder: AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if !flag {
-            print("[FlowX] Recording finished unsuccessfully")
+            print("[NimbusGlide] Recording finished unsuccessfully")
         }
     }
 }

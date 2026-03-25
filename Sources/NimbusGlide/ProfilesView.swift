@@ -129,7 +129,7 @@ private struct ProfileEditor: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Instructions")
                     .font(.headline)
-                Text("Tell FlowX how to process dictations with this profile.")
+                Text("Tell NimbusGlide how to process dictations with this profile.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

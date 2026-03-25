@@ -2,7 +2,7 @@
 
 import AppKit
 
-// Generate a FlowX app icon using Core Graphics
+// Generate a NimbusGlide app icon using Core Graphics
 func generateIcon() {
     let sizes: [(CGFloat, String)] = [
         (16, "icon_16x16"),
@@ -17,7 +17,7 @@ func generateIcon() {
         (1024, "icon_512x512@2x"),
     ]
 
-    let iconsetPath = "/tmp/FlowX.iconset"
+    let iconsetPath = "/tmp/NimbusGlide.iconset"
     let fm = FileManager.default
     try? fm.removeItem(atPath: iconsetPath)
     try! fm.createDirectory(atPath: iconsetPath, withIntermediateDirectories: true)

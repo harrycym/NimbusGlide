@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="FlowX"
+APP_NAME="NimbusGlide"
 APP_BUNDLE="$SCRIPT_DIR/$APP_NAME.app"
 CONTENTS="$APP_BUNDLE/Contents"
 
@@ -42,7 +42,7 @@ fi
 
 # Copy entitlements and sign
 if [ -f "$SCRIPT_DIR/$APP_NAME.entitlements" ]; then
-    SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "FlowX Dev" | head -1 | awk -F'"' '{print $2}')
+    SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "NimbusGlide Dev" | head -1 | awk -F'"' '{print $2}')
     if [ -n "$SIGN_IDENTITY" ]; then
         codesign --force --sign "$SIGN_IDENTITY" --entitlements "$SCRIPT_DIR/$APP_NAME.entitlements" "$APP_BUNDLE"
         echo "==> Signed with $SIGN_IDENTITY (stable identity)"
@@ -55,6 +55,6 @@ fi
 echo "==> Built: $APP_BUNDLE"
 echo ""
 echo "You can now:"
-echo "  1. Double-click FlowX.app to launch"
+echo "  1. Double-click NimbusGlide.app to launch"
 echo "  2. Drag it to /Applications"
 echo "  3. Run: open \"$APP_BUNDLE\""

@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "FlowX",
+    name: "NimbusGlide",
     platforms: [.macOS(.v13)],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.7.0")
     ],
     targets: [
         .executableTarget(
-            name: "FlowX",
+            name: "NimbusGlide",
             dependencies: [
                 .product(name: "Sparkle", package: "Sparkle")
             ],
-            path: "Sources/FlowX",
+            path: "Sources/NimbusGlide",
             resources: [
                 .copy("../../Resources")
             ],

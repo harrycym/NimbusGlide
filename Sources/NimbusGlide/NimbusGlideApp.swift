@@ -2,11 +2,11 @@ import SwiftUI
 import AppKit
 
 @main
-struct FlowXApp: App {
+struct NimbusGlideApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Window("FlowX", id: "main") {
+        Window("NimbusGlide", id: "main") {
             MainWindowView()
                 .environmentObject(appDelegate.pipelineState)
                 .environmentObject(appDelegate.profileManager)

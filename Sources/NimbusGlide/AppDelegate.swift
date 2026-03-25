@@ -16,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let pipelineState = PipelineState()
     let updateChecker = UpdateChecker()
     let usageTracker = UsageTracker()
-    var pipeline: FlowXPipeline!
+    var pipeline: NimbusGlidePipeline!
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.async {
                     let alert = NSAlert()
                     alert.messageText = "Microphone Access Required"
-                    alert.informativeText = "FlowX needs microphone access to record audio for transcription. Please grant access in System Settings > Privacy & Security > Microphone."
+                    alert.informativeText = "NimbusGlide needs microphone access to record audio for transcription. Please grant access in System Settings > Privacy & Security > Microphone."
                     alert.alertStyle = .warning
                     alert.addButton(withTitle: "Open Settings")
                     alert.addButton(withTitle: "OK")
@@ -48,7 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         aiService = AIService(settingsManager: settingsManager)
         aiService.usageTracker = usageTracker
 
-        pipeline = FlowXPipeline(
+        pipeline = NimbusGlidePipeline(
             audioRecorder: audioRecorder,
             aiService: aiService,
             appTracker: appTracker,
@@ -106,7 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Auto-show main window on launch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            if let window = NSApp.windows.first(where: { $0.title == "FlowX" }) {
+            if let window = NSApp.windows.first(where: { $0.title == "NimbusGlide" }) {
                 window.delegate = self
                 window.makeKeyAndOrderFront(nil)
             }

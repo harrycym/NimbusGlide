@@ -12,7 +12,7 @@ class AIService {
 
     func transcribeAudio(fileURL: URL) async throws -> String {
         guard let apiKey = settingsManager.apiKey, !apiKey.isEmpty else {
-            throw FlowXError.noAPIKey
+            throw NimbusGlideError.noAPIKey
         }
 
         let boundary = UUID().uuidString
@@ -35,12 +35,12 @@ class AIService {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw FlowXError.networkError("Invalid response")
+            throw NimbusGlideError.networkError("Invalid response")
         }
 
         guard httpResponse.statusCode == 200 else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw FlowXError.apiError("Groq Whisper error (\(httpResponse.statusCode)): \(errorBody)")
+            throw NimbusGlideError.apiError("Groq Whisper error (\(httpResponse.statusCode)): \(errorBody)")
         }
 
         let transcript = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -56,12 +56,12 @@ class AIService {
         memoryExamples: [MemoryEntry]
     ) async throws -> String {
         guard let apiKey = settingsManager.apiKey, !apiKey.isEmpty else {
-            throw FlowXError.noAPIKey
+            throw NimbusGlideError.noAPIKey
         }
 
         // Check usage limit
         if let tracker = usageTracker, tracker.hasReachedLimit {
-            throw FlowXError.usageLimitReached
+            throw NimbusGlideError.usageLimitReached
         }
 
         let parsed = WakewordParser.parse(transcript)
@@ -101,7 +101,7 @@ class AIService {
 
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw FlowXError.apiError("Groq LLM error: \(errorBody)")
+            throw NimbusGlideError.apiError("Groq LLM error: \(errorBody)")
         }
 
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -109,7 +109,7 @@ class AIService {
               let firstChoice = choices.first,
               let message = firstChoice["message"] as? [String: Any],
               let content = message["content"] as? String else {
-            throw FlowXError.apiError("Failed to parse Groq response")
+            throw NimbusGlideError.apiError("Failed to parse Groq response")
         }
 
         let result = content.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -203,7 +203,7 @@ private extension Data {
 
 // MARK: - Errors
 
-enum FlowXError: LocalizedError {
+enum NimbusGlideError: LocalizedError {
     case noAPIKey
     case networkError(String)
     case apiError(String)
@@ -213,7 +213,7 @@ enum FlowXError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noAPIKey:
-            return "FlowX is not configured correctly. Please reinstall."
+            return "NimbusGlide is not configured correctly. Please reinstall."
         case .networkError(let msg):
             return "Connection issue: \(msg)"
         case .apiError(let msg):

@@ -100,7 +100,7 @@ struct AppSettingsView: View {
                     // About
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("FlowX")
+                            Text("NimbusGlide")
                                 .font(.callout.weight(.medium))
                             Text("Version \(UpdateChecker.currentVersion)")
                                 .font(.caption)

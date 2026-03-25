@@ -66,7 +66,7 @@ struct OnboardingView: View {
                 .font(.system(size: 56, weight: .light))
                 .foregroundColor(.accentColor)
 
-            Text("Welcome to FlowX")
+            Text("Welcome to NimbusGlide")
                 .font(.largeTitle.weight(.bold))
 
             Text("Speak naturally. Get polished text.\nPasted right where you need it.")
@@ -94,7 +94,7 @@ struct OnboardingView: View {
             Text("Quick Setup")
                 .font(.title2.weight(.semibold))
 
-            Text("FlowX needs two permissions to work.\nThis only takes a moment.")
+            Text("NimbusGlide needs two permissions to work.\nThis only takes a moment.")
                 .font(.callout)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

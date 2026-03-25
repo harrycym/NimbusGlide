@@ -298,7 +298,7 @@ struct UpdateBanner: View {
             Image(systemName: "arrow.down.circle.fill")
                 .foregroundColor(.white)
             VStack(alignment: .leading, spacing: 2) {
-                Text("FlowX \(version) available")
+                Text("NimbusGlide \(version) available")
                     .font(.callout.weight(.medium))
                     .foregroundColor(.white)
                 if let notes, !notes.isEmpty {
@@ -310,7 +310,7 @@ struct UpdateBanner: View {
             }
             Spacer()
             Button("Update") {
-                NSWorkspace.shared.open(URL(string: "https://github.com/harrycym/FlowX")!)
+                NSWorkspace.shared.open(URL(string: "https://github.com/harrycym/NimbusGlide")!)
             }
             .buttonStyle(.bordered)
             .tint(.white)
