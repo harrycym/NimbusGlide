@@ -116,17 +116,17 @@ struct MainWindowView: View {
                     Button(action: { selectedItem = item }) {
                         HStack(spacing: 8) {
                             Image(systemName: item.icon)
-                                .font(.callout)
-                                .frame(width: 20)
+                                .font(.body)
+                                .frame(width: 22)
                             Text(item.rawValue)
-                                .font(.callout)
+                                .font(.body)
                             Spacer()
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
                         .background(selectedItem == item ? Color.accentColor.opacity(0.15) : Color.clear)
                         .cornerRadius(6)
-                        .foregroundColor(selectedItem == item ? .accentColor : .secondary)
+                        .foregroundColor(selectedItem == item ? .accentColor : .primary)
                     }
                     .buttonStyle(.plain)
                 }
