@@ -96,7 +96,7 @@ struct AppSettingsView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         } else {
-                            Text("Choose your dictation language. Upgrade to Pro for multi-language support.")
+                            Text("Choose your dictation language. You can switch anytime — free tier supports one language at a time. Upgrade to Pro for multi-language.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -107,14 +107,18 @@ struct AppSettingsView: View {
                                     get: { settingsManager.selectedLanguages.contains(language) },
                                     set: { isOn in
                                         if isOn {
-                                            if !usageTracker.isPro && !settingsManager.selectedLanguages.isEmpty {
-                                                // Free tier: only 1 language allowed
-                                                showLanguageUpgradeAlert = true
-                                            } else {
+                                            if usageTracker.isPro {
+                                                // Pro: add language
                                                 settingsManager.selectedLanguages.append(language)
+                                            } else {
+                                                // Free: swap to this language (only 1 allowed)
+                                                settingsManager.selectedLanguages = [language]
                                             }
                                         } else {
-                                            settingsManager.selectedLanguages.removeAll { $0 == language }
+                                            if usageTracker.isPro {
+                                                settingsManager.selectedLanguages.removeAll { $0 == language }
+                                            }
+                                            // Free: don't allow deselecting the only language
                                         }
                                     }
                                 ))

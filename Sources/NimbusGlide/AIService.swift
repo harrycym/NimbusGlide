@@ -239,7 +239,11 @@ class AIService {
         } else {
             // Free: single language only, reject other languages
             let lang = langs.first ?? "English"
-            prompt += "\n\nIMPORTANT: You MUST respond ONLY in \(lang). If the speaker's input is in a different language, respond with exactly: \"[Unsupported language — upgrade to Pro for multi-language dictation]\". Do not translate. Do not process the text."
+            prompt += "\n\nCRITICAL LANGUAGE RULE: The user's selected language is \(lang). You MUST follow these rules strictly:"
+            prompt += "\n1. If the transcript is in \(lang), process it normally and respond in \(lang)."
+            prompt += "\n2. If the transcript is in ANY other language (even partially), you MUST respond with ONLY this exact text and nothing else: [Unsupported language — upgrade to Pro for multi-language dictation]"
+            prompt += "\n3. NEVER translate text from one language to another. NEVER process text that is not in \(lang)."
+            prompt += "\n4. This rule overrides all other instructions. No exceptions."
         }
 
         return prompt

@@ -6,17 +6,17 @@
     <description>NimbusGlide update feed</description>
     <language>en</language>
     <item>
-      <title>NimbusGlide 1.6.1</title>
-      <description><![CDATA[<p>Fix column alignment in upgrade comparison table</p>]]></description>
-      <pubDate>Wed, 25 Mar 2026 13:45:38 +0000</pubDate>
-      <sparkle:version>1.6.1</sparkle:version>
-      <sparkle:shortVersionString>1.6.1</sparkle:shortVersionString>
+      <title>NimbusGlide 1.6.2</title>
+      <description><![CDATA[<p>Fix language selection: free tier swaps instead of blocking, stronger anti-translation prompt</p>]]></description>
+      <pubDate>Wed, 25 Mar 2026 13:49:53 +0000</pubDate>
+      <sparkle:version>1.6.2</sparkle:version>
+      <sparkle:shortVersionString>1.6.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/harrycym/NimbusGlide/releases/download/v1.6.1/NimbusGlide.zip"
-        length="3054501"
+        url="https://github.com/harrycym/NimbusGlide/releases/download/v1.6.2/NimbusGlide.zip"
+        length="3054751"
         type="application/octet-stream"
-        sparkle:edSignature="oJI5hUlCxLsvDym5nOx7puivVqVfGsEaGP3N1/BCLqD4APT4YAxHu3XOqFisnqPZI/uxwcq4xnocdYTY76/5Dg=="
+        sparkle:edSignature="NhFzvLHoun17o2X1L8Am/fz04bCoVVp8XG7dWRWZNkeIhKurkAv6nkdc2Fu/wkPR5wDUdVaKpNvXB5eiXVJsCw=="
       />
     </item>
   </channel>
