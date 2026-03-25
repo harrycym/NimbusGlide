@@ -1,0 +1,193 @@
+import SwiftUI
+
+struct ProfilesView: View {
+    @EnvironmentObject var profileManager: ProfileManager
+    @State private var selectedProfileId: UUID?
+    @State private var showingAddSheet = false
+
+    var body: some View {
+        HSplitView {
+            // Sidebar: profile list
+            VStack(spacing: 0) {
+                List(selection: $selectedProfileId) {
+                    ForEach(profileManager.profiles) { profile in
+                        ProfileRow(
+                            profile: profile,
+                            isActive: profile.id == profileManager.activeProfileId
+                        )
+                        .tag(profile.id)
+                    }
+                    .onDelete { offsets in
+                        profileManager.deleteProfile(at: offsets)
+                        if let id = selectedProfileId,
+                           !profileManager.profiles.contains(where: { $0.id == id }) {
+                            selectedProfileId = profileManager.profiles.first?.id
+                        }
+                    }
+                }
+                .listStyle(.sidebar)
+
+                Divider()
+
+                HStack {
+                    Button(action: { showingAddSheet = true }) {
+                        Label("Add Profile", systemImage: "plus")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                    Spacer()
+                    Text("\(profileManager.profiles.count) profiles")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+            }
+            .frame(minWidth: 180, idealWidth: 200, maxWidth: 250)
+
+            // Detail editor
+            if let id = selectedProfileId,
+               let index = profileManager.profiles.firstIndex(where: { $0.id == id }) {
+                ProfileEditor(
+                    profile: $profileManager.profiles[index],
+                    isActive: id == profileManager.activeProfileId,
+                    onSetActive: { profileManager.activeProfileId = id }
+                )
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 40))
+                        .foregroundColor(.secondary)
+                    Text("Select a profile to edit")
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .sheet(isPresented: $showingAddSheet) {
+            AddProfileView(profileManager: profileManager, isPresented: $showingAddSheet)
+        }
+        .onAppear {
+            if selectedProfileId == nil {
+                selectedProfileId = profileManager.activeProfileId ?? profileManager.profiles.first?.id
+            }
+        }
+    }
+}
+
+// MARK: - Profile Row
+
+private struct ProfileRow: View {
+    let profile: Profile
+    let isActive: Bool
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(profile.name)
+                    .font(.body.weight(isActive ? .semibold : .regular))
+                Text(profile.instructions)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer()
+            if isActive {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.accentColor)
+                    .font(.caption)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+// MARK: - Profile Editor
+
+private struct ProfileEditor: View {
+    @Binding var profile: Profile
+    let isActive: Bool
+    let onSetActive: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                TextField("Profile Name", text: $profile.name)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.title3.weight(.medium))
+
+                if isActive {
+                    Label("Active", systemImage: "checkmark.circle.fill")
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(.accentColor)
+                } else {
+                    Button("Set Active") { onSetActive() }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Instructions")
+                    .font(.headline)
+                Text("Tell FlowX how to process dictations with this profile.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            TextEditor(text: $profile.instructions)
+                .font(.body)
+                .padding(4)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.secondary.opacity(0.2))
+                )
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+}
+
+// MARK: - Add Profile
+
+private struct AddProfileView: View {
+    let profileManager: ProfileManager
+    @Binding var isPresented: Bool
+    @State private var name = ""
+    @State private var instructions = ""
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("New Profile")
+                .font(.headline)
+
+            TextField("Name", text: $name)
+                .textFieldStyle(.roundedBorder)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Instructions")
+                    .font(.subheadline)
+                TextEditor(text: $instructions)
+                    .frame(height: 100)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.secondary.opacity(0.2))
+                    )
+            }
+
+            HStack {
+                Button("Cancel") { isPresented = false }
+                    .keyboardShortcut(.cancelAction)
+                Spacer()
+                Button("Add") {
+                    profileManager.addProfile(Profile(name: name, instructions: instructions))
+                    isPresented = false
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.defaultAction)
+                .disabled(name.isEmpty)
+            }
+        }
+        .padding(20)
+        .frame(width: 380, height: 280)
+    }
+}

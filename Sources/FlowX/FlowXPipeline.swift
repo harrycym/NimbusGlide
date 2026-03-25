@@ -1,0 +1,149 @@
+import Foundation
+import AppKit
+
+class FlowXPipeline {
+    private let audioRecorder: AudioRecorder
+    private let aiService: AIService
+    private let appTracker: AppTracker
+    private let keystrokeSimulator: KeystrokeSimulator
+    private let profileManager: ProfileManager
+    private let memoryManager: MemoryManager
+
+    private var isProcessing = false
+    weak var menuBarManager: MenuBarManager?
+    var pipelineState: PipelineState?
+
+    /// Tracks the last non-FlowX frontmost app (for manual record button)
+    private var lastExternalApp: String = "Unknown"
+
+    init(
+        audioRecorder: AudioRecorder,
+        aiService: AIService,
+        appTracker: AppTracker,
+        keystrokeSimulator: KeystrokeSimulator,
+        profileManager: ProfileManager,
+        memoryManager: MemoryManager
+    ) {
+        self.audioRecorder = audioRecorder
+        self.aiService = aiService
+        self.appTracker = appTracker
+        self.keystrokeSimulator = keystrokeSimulator
+        self.profileManager = profileManager
+        self.memoryManager = memoryManager
+    }
+
+    func toggleRecording() {
+        if audioRecorder.isRecording {
+            stopRecordingAndProcess()
+        } else {
+            startRecording()
+        }
+    }
+
+    func startRecording() {
+        guard !isProcessing else {
+            print("[FlowX] Already processing, ignoring record request")
+            return
+        }
+
+        // Capture frontmost app before FlowX potentially takes focus
+        let currentApp = appTracker.frontmostAppName()
+        if currentApp != "FlowX" {
+            lastExternalApp = currentApp
+        }
+
+        audioRecorder.startRecording()
+        menuBarManager?.setRecordingIndicator(true)
+        menuBarManager?.updateStatus("Recording…")
+
+        DispatchQueue.main.async {
+            self.pipelineState?.status = .recording
+        }
+    }
+
+    func stopRecordingAndProcess() {
+        guard let recordingURL = audioRecorder.stopRecording() else {
+            print("[FlowX] No recording to process")
+            menuBarManager?.setRecordingIndicator(false)
+            menuBarManager?.updateStatus("Ready")
+            DispatchQueue.main.async {
+                self.pipelineState?.status = .idle
+            }
+            return
+        }
+
+        menuBarManager?.setRecordingIndicator(false)
+        menuBarManager?.updateStatus("Processing…")
+        isProcessing = true
+
+        DispatchQueue.main.async {
+            self.pipelineState?.status = .processing
+        }
+
+        // Use the last external app if FlowX is frontmost (manual record button case)
+        let currentApp = appTracker.frontmostAppName()
+        let activeApp = (currentApp == "FlowX") ? lastExternalApp : currentApp
+        let profileInstructions = profileManager.activeProfile?.instructions
+        let memoryExamples = memoryManager.recentExamples()
+
+        Task {
+            do {
+                let transcript = try await aiService.transcribeAudio(fileURL: recordingURL)
+                print("[FlowX] Transcript: \(transcript)")
+
+                guard !transcript.isEmpty else {
+                    print("[FlowX] Empty transcript, skipping")
+                    await finish(status: .idle)
+                    return
+                }
+
+                let result = try await aiService.processWithLLM(
+                    transcript: transcript,
+                    activeApp: activeApp,
+                    profileInstructions: profileInstructions,
+                    memoryExamples: memoryExamples
+                )
+                print("[FlowX] Result: \(result)")
+
+                guard !result.isEmpty else {
+                    print("[FlowX] Empty LLM result, skipping")
+                    await finish(status: .idle)
+                    return
+                }
+
+                // Save to memory for few-shot learning
+                await MainActor.run {
+                    memoryManager.addEntry(rawTranscript: transcript, polishedText: result)
+                    pipelineState?.recordSuccess(transcript: transcript, result: result)
+                }
+
+                // Paste into frontmost app
+                await MainActor.run {
+                    keystrokeSimulator.pasteText(result)
+                }
+
+                await finish(status: .idle)
+
+            } catch {
+                print("[FlowX] Pipeline error: \(error.localizedDescription)")
+                await MainActor.run {
+                    pipelineState?.status = .error
+                    pipelineState?.errorMessage = error.localizedDescription
+                }
+                await finish(status: .error)
+            }
+
+            audioRecorder.cleanup()
+        }
+    }
+
+    @MainActor
+    private func finish(status: PipelineStatus) {
+        isProcessing = false
+        menuBarManager?.updateStatus(status.rawValue)
+        // Only set idle if we're finishing successfully — error state is set in catch
+        if status == .idle {
+            pipelineState?.status = .idle
+        }
+    }
+}

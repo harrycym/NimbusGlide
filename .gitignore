@@ -1,0 +1,7 @@
+.build/
+FlowX.app/
+*.o
+*.d
+*.swp
+.DS_Store
+/tmp/
