@@ -26,9 +26,11 @@
 	<string>FlowX needs microphone access to record your voice for transcription.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUEnableInsecureFeedURLs</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/harrycym/FlowX/main/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string></string>
+	<string>wNA1NzwwYXjqTttgcRyfGIIKPaB1H3IECiXTxOxJTss=</string>
 </dict>
 </plist>
