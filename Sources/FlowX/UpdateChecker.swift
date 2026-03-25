@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 class UpdateChecker: ObservableObject {
-    static let currentVersion = "1.0.0"
+    static let currentVersion = "1.0.1"
     private let versionURL = "https://raw.githubusercontent.com/harrycym/FlowX/main/version.json"
 
     @Published var updateAvailable = false
