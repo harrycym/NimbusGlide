@@ -4,10 +4,11 @@ struct HomeView: View {
     @EnvironmentObject var pipelineState: PipelineState
     @EnvironmentObject var profileManager: ProfileManager
     @EnvironmentObject var updateChecker: UpdateChecker
+    @EnvironmentObject var usageTracker: UsageTracker
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 // Update banner
                 if updateChecker.updateAvailable, let version = updateChecker.latestVersion {
                     UpdateBanner(version: version, notes: updateChecker.releaseNotes)
@@ -22,31 +23,27 @@ struct HomeView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                // Status indicator
-                StatusSection(status: pipelineState.status)
-                    .padding(.top, 8)
+                // Paywall if limit reached
+                if usageTracker.hasReachedLimit {
+                    PaywallBanner()
+                } else {
+                    // Main status
+                    StatusSection(status: pipelineState.status)
+                        .padding(.top, 12)
 
-                // Record button
-                RecordButton(status: pipelineState.status) {
-                    pipelineState.onToggleRecording?()
+                    // Record button
+                    RecordButton(status: pipelineState.status) {
+                        pipelineState.onToggleRecording?()
+                    }
                 }
-
-                // Quick info row
-                QuickInfoRow(
-                    activeProfile: profileManager.activeProfile,
-                    apiConfigured: pipelineState.isAPIKeyConfigured
-                )
 
                 // Last result
                 if let transcript = pipelineState.lastTranscript,
                    let result = pipelineState.lastResult {
                     LastResultCard(transcript: transcript, result: result)
                 }
-
-                // Instructions
-                InstructionCard()
             }
-            .padding(20)
+            .padding(24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut(duration: 0.25), value: pipelineState.errorMessage)

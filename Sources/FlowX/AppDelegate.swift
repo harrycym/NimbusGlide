@@ -60,6 +60,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuBarManager = MenuBarManager(pipeline: pipeline, settingsManager: settingsManager, profileManager: profileManager)
         pipeline.menuBarManager = menuBarManager
         pipeline.pipelineState = pipelineState
+        pipeline.settingsManager = settingsManager
 
         // Wire toggle recording closure for the UI record button
         pipelineState.onToggleRecording = { [weak self] in
@@ -90,6 +91,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.hotkeyManager.hotkey = newHotkey
             }
             .store(in: &cancellables)
+
+        // Sync custom key code changes
+        settingsManager.$customKeyCode
+            .receive(on: RunLoop.main)
+            .sink { [weak self] code in
+                self?.hotkeyManager.customKeyCode = code
+            }
+            .store(in: &cancellables)
+        hotkeyManager.customKeyCode = settingsManager.customKeyCode
 
         // Check for updates
         updateChecker.checkForUpdate()

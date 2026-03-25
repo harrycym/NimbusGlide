@@ -2,13 +2,14 @@ import AppKit
 import SwiftUI
 import Combine
 
-class MenuBarManager: NSObject {
+class MenuBarManager: NSObject, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private let pipeline: FlowXPipeline
     private let settingsManager: SettingsManager
     private let profileManager: ProfileManager
     private var cancellables = Set<AnyCancellable>()
-    
+    private var profileSubmenu: NSMenu!
+
     // Animation properties
     private var animationTimer: Timer?
     private var animationFrame = 0
@@ -31,32 +32,61 @@ class MenuBarManager: NSObject {
         }
 
         let menu = NSMenu()
+
         let statusMenuItem = NSMenuItem(title: "FlowX — Ready", action: nil, keyEquivalent: "")
         statusMenuItem.isEnabled = false
         menu.addItem(statusMenuItem)
         menu.addItem(NSMenuItem.separator())
 
-        let profileMenuItem = NSMenuItem(title: "Active Profile", action: nil, keyEquivalent: "")
-        let profileSubmenu = NSMenu()
+        // Profiles
+        let profileMenuItem = NSMenuItem(title: "Profiles", action: nil, keyEquivalent: "")
+        profileMenuItem.image = NSImage(systemSymbolName: "person.2", accessibilityDescription: nil)
+        profileSubmenu = NSMenu()
+        profileSubmenu.delegate = self
         buildProfileSubmenu(profileSubmenu)
         profileMenuItem.submenu = profileSubmenu
         menu.addItem(profileMenuItem)
+
+        // History
+        let historyItem = NSMenuItem(title: "History", action: #selector(openHistory), keyEquivalent: "h")
+        historyItem.image = NSImage(systemSymbolName: "clock", accessibilityDescription: nil)
+        historyItem.target = self
+        menu.addItem(historyItem)
+
         menu.addItem(NSMenuItem.separator())
 
+        // Auto-copy toggle
+        let autoCopyItem = NSMenuItem(title: "Auto-Copy to Clipboard", action: #selector(toggleAutoCopy(_:)), keyEquivalent: "")
+        autoCopyItem.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: nil)
+        autoCopyItem.target = self
+        autoCopyItem.state = settingsManager.autoCopyToClipboard ? .on : .off
+        menu.addItem(autoCopyItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // Show FlowX
         let showWindowItem = NSMenuItem(title: "Show FlowX", action: #selector(showMainWindow), keyEquivalent: "o")
+        showWindowItem.image = NSImage(systemSymbolName: "macwindow", accessibilityDescription: nil)
         showWindowItem.target = self
         menu.addItem(showWindowItem)
 
+        // Settings
         let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
+        settingsItem.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
         settingsItem.target = self
         menu.addItem(settingsItem)
 
+        // About
         let aboutItem = NSMenuItem(title: "About FlowX", action: #selector(showAbout), keyEquivalent: "")
+        aboutItem.image = NSImage(systemSymbolName: "info.circle", accessibilityDescription: nil)
         aboutItem.target = self
         menu.addItem(aboutItem)
+
         menu.addItem(NSMenuItem.separator())
 
+        // Quit
         let quitItem = NSMenuItem(title: "Quit FlowX", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.image = NSImage(systemSymbolName: "power", accessibilityDescription: nil)
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -135,6 +165,13 @@ class MenuBarManager: NSObject {
         statusItem.button?.image = NSImage(systemSymbolName: name, accessibilityDescription: "FlowX")?.withSymbolConfiguration(config)
     }
 
+    func menuWillOpen(_ menu: NSMenu) {
+        if menu == profileSubmenu {
+            menu.removeAllItems()
+            buildProfileSubmenu(menu)
+        }
+    }
+
     private func buildProfileSubmenu(_ menu: NSMenu) {
         let profiles = profileManager.profiles
         let activeId = profileManager.activeProfileId
@@ -169,9 +206,19 @@ class MenuBarManager: NSObject {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    @objc private func openHistory() {
+        showMainWindow()
+        NotificationCenter.default.post(name: .flowxNavigateToHistory, object: nil)
+    }
+
+    @objc private func toggleAutoCopy(_ sender: NSMenuItem) {
+        settingsManager.autoCopyToClipboard.toggle()
+        sender.state = settingsManager.autoCopyToClipboard ? .on : .off
+    }
+
     @objc private func openSettings() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        NSApp.activate(ignoringOtherApps: true)
+        showMainWindow()
+        NotificationCenter.default.post(name: .flowxNavigateToSettings, object: nil)
     }
 
     @objc private func showAbout() {

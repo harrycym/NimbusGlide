@@ -36,6 +36,14 @@ if [ -f "$ICON_PATH" ]; then
     cp "$ICON_PATH" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
 fi
 
+# Bundle Secrets.plist (API key — gitignored)
+if [ -f "$SCRIPT_DIR/Resources/Secrets.plist" ]; then
+    cp "$SCRIPT_DIR/Resources/Secrets.plist" "$APP_BUNDLE/Contents/Resources/Secrets.plist"
+    echo "==> Bundled Secrets.plist"
+else
+    echo "==> WARNING: Resources/Secrets.plist not found — API key will not be bundled!"
+fi
+
 if [ -f "$SCRIPT_DIR/$APP_NAME.entitlements" ]; then
     # Use stable "FlowX Dev" identity if available, otherwise fall back to ad-hoc
     SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "FlowX Dev" | head -1 | awk -F'"' '{print $2}')

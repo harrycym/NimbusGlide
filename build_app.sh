@@ -34,6 +34,12 @@ if [ -f "$ICON_PATH" ]; then
     cp "$ICON_PATH" "$CONTENTS/Resources/AppIcon.icns"
 fi
 
+# Bundle Secrets.plist
+if [ -f "$SCRIPT_DIR/Resources/Secrets.plist" ]; then
+    cp "$SCRIPT_DIR/Resources/Secrets.plist" "$CONTENTS/Resources/Secrets.plist"
+    echo "==> Bundled Secrets.plist"
+fi
+
 # Copy entitlements and sign
 if [ -f "$SCRIPT_DIR/$APP_NAME.entitlements" ]; then
     SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null | grep "FlowX Dev" | head -1 | awk -F'"' '{print $2}')

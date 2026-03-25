@@ -11,14 +11,23 @@ struct StatusPill: View {
             Circle()
                 .fill(statusColor)
                 .frame(width: 8, height: 8)
-            Text(status.rawValue)
+            Text(statusLabel)
                 .font(.caption.weight(.medium))
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .background(statusColor.opacity(0.1))
+        .background(statusColor.opacity(0.08))
         .cornerRadius(12)
+    }
+
+    private var statusLabel: String {
+        switch status {
+        case .idle: return "Ready"
+        case .recording: return "Listening"
+        case .processing: return "Thinking"
+        case .error: return "Error"
+        }
     }
 
     private var statusColor: Color {
@@ -38,16 +47,16 @@ struct StatusSection: View {
     @State private var isAnimating = false
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(statusColor.opacity(0.1))
-                    .frame(width: 120, height: 120)
+                    .fill(statusColor.opacity(0.06))
+                    .frame(width: 140, height: 140)
 
                 Circle()
-                    .fill(statusColor.opacity(0.2))
-                    .frame(width: 90, height: 90)
-                    .scaleEffect(status == .recording && isAnimating ? 1.25 : 1.0)
+                    .fill(statusColor.opacity(0.12))
+                    .frame(width: 100, height: 100)
+                    .scaleEffect(status == .recording && isAnimating ? 1.3 : 1.0)
                     .animation(
                         status == .recording
                             ? .easeInOut(duration: 0.8).repeatForever(autoreverses: true)
@@ -61,17 +70,39 @@ struct StatusSection: View {
                         .progressViewStyle(.circular)
                 } else {
                     Image(systemName: statusIcon)
-                        .font(.system(size: 36))
+                        .font(.system(size: 36, weight: .light))
                         .foregroundColor(statusColor)
                 }
             }
 
-            Text(status.rawValue)
-                .font(.title2.weight(.semibold))
+            Text(statusLabel)
+                .font(.title3.weight(.medium))
                 .foregroundColor(statusColor)
+
+            Text(statusHint)
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .onAppear { isAnimating = true }
         .onChange(of: status) { _ in isAnimating = true }
+    }
+
+    private var statusLabel: String {
+        switch status {
+        case .idle: return "Ready"
+        case .recording: return "Listening..."
+        case .processing: return "Polishing your words..."
+        case .error: return "Something went wrong"
+        }
+    }
+
+    private var statusHint: String {
+        switch status {
+        case .idle: return "Hold your hotkey or tap the button to speak"
+        case .recording: return "Release when you're done"
+        case .processing: return "This usually takes a second"
+        case .error: return "Check the error above for details"
+        }
     }
 
     private var statusColor: Color {
@@ -85,10 +116,10 @@ struct StatusSection: View {
 
     private var statusIcon: String {
         switch status {
-        case .idle: return "checkmark.circle.fill"
+        case .idle: return "waveform"
         case .recording: return "mic.fill"
-        case .processing: return "gear"
-        case .error: return "exclamationmark.triangle.fill"
+        case .processing: return "sparkles"
+        case .error: return "exclamationmark.circle"
         }
     }
 }
@@ -105,16 +136,16 @@ struct RecordButton: View {
         Button(action: action) {
             HStack(spacing: 8) {
                 Image(systemName: buttonIcon)
-                    .font(.body.weight(.semibold))
+                    .font(.body.weight(.medium))
                 Text(buttonLabel)
-                    .font(.body.weight(.semibold))
+                    .font(.body.weight(.medium))
             }
             .foregroundColor(.white)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 28)
             .padding(.vertical, 12)
             .background(buttonColor)
             .cornerRadius(25)
-            .scaleEffect(isHovering ? 1.05 : 1.0)
+            .scaleEffect(isHovering ? 1.04 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: isHovering)
         }
         .buttonStyle(.plain)
@@ -132,9 +163,9 @@ struct RecordButton: View {
 
     private var buttonLabel: String {
         switch status {
-        case .recording: return "Stop Recording"
-        case .processing: return "Processing…"
-        default: return "Start Recording"
+        case .recording: return "Stop"
+        case .processing: return "Working..."
+        default: return "Speak"
         }
     }
 
@@ -147,100 +178,6 @@ struct RecordButton: View {
     }
 }
 
-// MARK: - Instruction Card
-
-struct InstructionCard: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("How to Use", systemImage: "questionmark.circle")
-                .font(.headline)
-
-            InstructionRow(
-                icon: "option",
-                text: "Hold the **Right Option** key to record, release to process"
-            )
-            InstructionRow(
-                icon: "mic.fill",
-                text: "Or click the **Start Recording** button above"
-            )
-            InstructionRow(
-                icon: "text.quote",
-                text: "Say **\"FlowX\"** followed by a command to edit selected text"
-            )
-            InstructionRow(
-                icon: "doc.on.clipboard",
-                text: "Processed text is **automatically pasted** into your active app"
-            )
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.controlBackgroundColor))
-        .cornerRadius(12)
-    }
-}
-
-private struct InstructionRow: View {
-    let icon: String
-    let text: LocalizedStringKey
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: icon)
-                .frame(width: 20)
-                .foregroundColor(.accentColor)
-            Text(text)
-                .font(.callout)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-// MARK: - Quick Info Row
-
-struct QuickInfoRow: View {
-    let activeProfile: Profile?
-    let apiConfigured: Bool
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Active Profile
-            GroupBox {
-                HStack(spacing: 8) {
-                    Image(systemName: "person.circle.fill")
-                        .foregroundColor(.accentColor)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Active Profile")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(activeProfile?.name ?? "None")
-                            .font(.callout.weight(.medium))
-                    }
-                    Spacer()
-                }
-                .padding(4)
-            }
-
-            // API Status
-            GroupBox {
-                HStack(spacing: 8) {
-                    Image(systemName: apiConfigured ? "checkmark.shield.fill" : "xmark.shield.fill")
-                        .foregroundColor(apiConfigured ? .green : .red)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("APIs")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(apiConfigured ? "Connected" : "Keys Missing")
-                            .font(.callout.weight(.medium))
-                            .foregroundColor(apiConfigured ? .primary : .red)
-                    }
-                    Spacer()
-                }
-                .padding(4)
-            }
-        }
-    }
-}
-
 // MARK: - Last Result Card
 
 struct LastResultCard: View {
@@ -249,49 +186,104 @@ struct LastResultCard: View {
     @State private var copied = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Label("Last Dictation", systemImage: "text.bubble")
-                    .font(.headline)
+                Text("Last dictation")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.secondary)
                 Spacer()
                 Button(action: copyResult) {
                     Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                        .font(.caption)
                         .foregroundColor(copied ? .green : .secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Copy result")
+                .help("Copy to clipboard")
             }
 
-            Text("You said:")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text(transcript)
-                .font(.callout)
-                .foregroundColor(.secondary)
-                .lineLimit(3)
-
-            Divider()
-
-            Text("Output:")
-                .font(.caption)
-                .foregroundColor(.secondary)
             Text(result)
                 .font(.body)
                 .textSelection(.enabled)
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.controlBackgroundColor))
+                .cornerRadius(8)
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.controlBackgroundColor))
-        .cornerRadius(12)
     }
 
     private func copyResult() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(result, forType: .string)
         copied = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            copied = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+    }
+}
+
+// MARK: - Usage Meter
+
+struct UsageMeter: View {
+    @EnvironmentObject var usageTracker: UsageTracker
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("\(usageTracker.totalWordsUsed.formatted()) words used")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                if !usageTracker.isPaid {
+                    Text("\(usageTracker.wordsRemaining.formatted()) left")
+                        .font(.caption)
+                        .foregroundColor(usageTracker.usageRatio > 0.8 ? .orange : .secondary)
+                }
+            }
+
+            if !usageTracker.isPaid {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.secondary.opacity(0.15))
+                            .frame(height: 4)
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(usageTracker.usageRatio > 0.8 ? Color.orange : Color.accentColor)
+                            .frame(width: geo.size.width * usageTracker.usageRatio, height: 4)
+                    }
+                }
+                .frame(height: 4)
+            }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - Paywall Banner
+
+struct PaywallBanner: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 28))
+                .foregroundColor(.orange)
+
+            Text("Free trial ended")
+                .font(.headline)
+
+            Text("You've used your free words.\nUpgrade to keep speaking.")
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button("Upgrade") {
+                // TODO: Link to payment portal
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(Color(.controlBackgroundColor))
+        .cornerRadius(12)
     }
 }
 
@@ -307,7 +299,7 @@ struct UpdateBanner: View {
                 .foregroundColor(.white)
             VStack(alignment: .leading, spacing: 2) {
                 Text("FlowX \(version) available")
-                    .font(.callout.weight(.semibold))
+                    .font(.callout.weight(.medium))
                     .foregroundColor(.white)
                 if let notes, !notes.isEmpty {
                     Text(notes)
@@ -318,7 +310,6 @@ struct UpdateBanner: View {
             }
             Spacer()
             Button("Update") {
-                // Open the repo so user can pull & rebuild
                 NSWorkspace.shared.open(URL(string: "https://github.com/harrycym/FlowX")!)
             }
             .buttonStyle(.bordered)
@@ -372,7 +363,7 @@ struct PermissionRow: View {
             HStack {
                 Image(systemName: icon)
                     .frame(width: 24)
-                    .foregroundColor(granted ? .green : .red)
+                    .foregroundColor(granted ? .green : .orange)
                 Text(name)
                 Spacer()
                 if granted {
@@ -380,8 +371,10 @@ struct PermissionRow: View {
                         .font(.caption)
                         .foregroundColor(.green)
                 } else {
-                    Button("Open System Settings", action: action)
+                    Button("Grant Access", action: action)
                         .font(.caption)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                 }
             }
             if !granted, let hint {

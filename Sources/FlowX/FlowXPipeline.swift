@@ -12,6 +12,7 @@ class FlowXPipeline {
     private var isProcessing = false
     weak var menuBarManager: MenuBarManager?
     var pipelineState: PipelineState?
+    var settingsManager: SettingsManager?
 
     /// Tracks the last non-FlowX frontmost app (for manual record button)
     private var lastExternalApp: String = "Unknown"
@@ -115,6 +116,14 @@ class FlowXPipeline {
                 await MainActor.run {
                     memoryManager.addEntry(rawTranscript: transcript, polishedText: result)
                     pipelineState?.recordSuccess(transcript: transcript, result: result)
+                }
+
+                // Auto-copy to clipboard if enabled
+                if self.settingsManager?.autoCopyToClipboard == true {
+                    await MainActor.run {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(result, forType: .string)
+                    }
                 }
 
                 // Paste into frontmost app

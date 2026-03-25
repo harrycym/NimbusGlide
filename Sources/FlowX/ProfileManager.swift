@@ -44,10 +44,16 @@ class ProfileManager: ObservableObject {
         }
 
         if let idString = UserDefaults.standard.string(forKey: Self.activeProfileKey),
-           let uuid = UUID(uuidString: idString) {
+           let uuid = UUID(uuidString: idString),
+           profiles.contains(where: { $0.id == uuid }) {
             self.activeProfileId = uuid
         } else {
-            self.activeProfileId = profiles.first?.id
+            // Default to General (first profile) and persist it
+            let firstId = profiles.first?.id
+            self.activeProfileId = firstId
+            if let id = firstId {
+                UserDefaults.standard.set(id.uuidString, forKey: Self.activeProfileKey)
+            }
         }
     }
 
