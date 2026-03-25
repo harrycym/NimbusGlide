@@ -2,6 +2,7 @@ import Foundation
 
 class AIService {
     private let settingsManager: SettingsManager
+    var usageTracker: UsageTracker?
 
     init(settingsManager: SettingsManager) {
         self.settingsManager = settingsManager
@@ -58,6 +59,11 @@ class AIService {
             throw FlowXError.noAPIKey
         }
 
+        // Check usage limit
+        if let tracker = usageTracker, tracker.hasReachedLimit {
+            throw FlowXError.usageLimitReached
+        }
+
         let parsed = WakewordParser.parse(transcript)
         let systemPrompt = buildSystemPrompt(
             parsed: parsed,
@@ -108,6 +114,11 @@ class AIService {
 
         let result = content.trimmingCharacters(in: .whitespacesAndNewlines)
 
+        // Track usage
+        if let tracker = usageTracker {
+            await MainActor.run { tracker.recordWords(result) }
+        }
+
         // Guard against the model going into chatbot mode — if the output is
         // drastically longer than the input and contains telltale phrases, discard it
         let chatbotPhrases = ["I'm here to help", "I don't have the capability", "text-based", "How can I", "What can I", "I'm a"]
@@ -149,6 +160,7 @@ class AIService {
             3. REMOVE FILLER: Only strip meaningless verbal tics like "um", "uh", "ah", "er", and repeated stuttered words. Do NOT remove words that carry meaning or tone like "honestly", "actually", "basically", "literally", "seriously" — those are intentional.
             4. KEEP ORIGINAL INTENT: Never answer questions asked in the transcript. Just transcribe the question perfectly.
             5. NO CHATBOT BEHAVIOR: You are a silent backend engine. NEVER output conversational prefixes like "Here is your text" or "Sure". ONLY output the finalized, flowing text.
+            6. PRESERVE AUTHENTIC VOICE: NEVER sanitize, soften, or remove expletives, slang, or emotional language. If the speaker says "fucking", output "fucking". Preserve the speaker's raw personality exactly as spoken. Do NOT substitute or censor any words.
             
             The final text is being injected directly into '\(activeApp)'.
             """
@@ -196,17 +208,20 @@ enum FlowXError: LocalizedError {
     case networkError(String)
     case apiError(String)
     case recordingFailed
+    case usageLimitReached
 
     var errorDescription: String? {
         switch self {
         case .noAPIKey:
-            return "No Groq API key configured. Please set it in Settings."
+            return "FlowX is not configured correctly. Please reinstall."
         case .networkError(let msg):
-            return "Network error: \(msg)"
+            return "Connection issue: \(msg)"
         case .apiError(let msg):
             return msg
         case .recordingFailed:
-            return "Failed to record audio."
+            return "Couldn't access your microphone. Check permissions."
+        case .usageLimitReached:
+            return "You've used all your free words. Upgrade to keep speaking."
         }
     }
 }
