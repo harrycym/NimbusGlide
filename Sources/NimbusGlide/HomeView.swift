@@ -94,7 +94,7 @@ struct HomeView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Welcome back, \(userName)")
-                        .font(.title2.weight(.bold))
+                        .font(NimbusFonts.pageTitle)
                         .foregroundColor(NimbusColors.heading)
                 }
                 Spacer()
@@ -102,7 +102,7 @@ struct HomeView: View {
             }
 
             // Stats row
-            HStack(spacing: 24) {
+            HStack(spacing: 32) {
                 StatBadge(
                     icon: "flame.fill",
                     color: .orange,
@@ -147,19 +147,19 @@ struct HomeView: View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Hold ")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
                 +
                 Text(hotkeyDisplay)
-                    .font(.title3.weight(.bold))
+                    .font(.system(size: 17, weight: .bold))
                     .foregroundColor(.white)
                 +
                 Text(" → to dictate and let NimbusGlide format for you")
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
 
                 Text("Press and hold \(hotkeyDisplay) to dictate in any app. NimbusGlide's Smart Formatting will handle punctuation, new lines, lists, and adjust when you change your mind mid-sentence.")
-                    .font(.caption)
+                    .font(.system(size: 13))
                     .foregroundColor(.white.opacity(0.8))
                     .lineSpacing(2)
 
@@ -229,17 +229,17 @@ struct HomeView: View {
 
             // Status label
             Text(isRecording ? "Listening..." : "Tap to dictate")
-                .font(.callout.weight(.medium))
+                .font(NimbusFonts.bodyMedium)
                 .foregroundColor(isRecording ? NimbusColors.recording : NimbusColors.muted)
 
             // Hotkey hint
             HStack(spacing: 4) {
                 Text("or hold")
-                    .font(.caption)
+                    .font(NimbusFonts.caption)
                     .foregroundColor(NimbusColors.muted)
 
                 Text(hotkeyDisplay)
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(NimbusColors.heading)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
@@ -251,7 +251,7 @@ struct HomeView: View {
                     )
 
                 Text("to dictate")
-                    .font(.caption)
+                    .font(NimbusFonts.caption)
                     .foregroundColor(NimbusColors.muted)
             }
         }
@@ -332,9 +332,10 @@ struct HomeView: View {
             // "TODAY" header
             if !memoryManager.entries.isEmpty {
                 Text("TODAY")
-                    .font(.caption.weight(.semibold))
+                    .font(NimbusFonts.sectionHeader)
                     .foregroundColor(NimbusColors.muted)
                     .tracking(1)
+                    .padding(.top, 20)
                     .padding(.bottom, 12)
 
                 VStack(spacing: 0) {
@@ -433,13 +434,13 @@ struct StatBadge: View {
     var body: some View {
         HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.caption2)
+                .font(NimbusFonts.caption)
                 .foregroundColor(color)
             Text(value)
-                .font(.callout.weight(.semibold))
+                .font(NimbusFonts.bodyMedium)
                 .foregroundColor(NimbusColors.heading)
             Text(label)
-                .font(.caption)
+                .font(NimbusFonts.caption)
                 .foregroundColor(NimbusColors.muted)
         }
     }
@@ -455,14 +456,14 @@ struct DictationRow: View {
         HStack(alignment: .top, spacing: 12) {
             // Timestamp
             Text(entry.timestamp, format: .dateTime.hour().minute())
-                .font(.caption.monospaced())
+                .font(NimbusFonts.caption.monospaced())
                 .foregroundColor(NimbusColors.muted)
                 .frame(width: 60, alignment: .trailing)
 
             // Content
             VStack(alignment: .leading, spacing: 4) {
                 Text(entry.polishedText)
-                    .font(.callout)
+                    .font(NimbusFonts.body)
                     .foregroundColor(NimbusColors.heading)
                     .lineLimit(3)
                     .textSelection(.enabled)
@@ -480,7 +481,7 @@ struct DictationRow: View {
             .opacity(0.7)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 16)
     }
 
     private func copyText() {

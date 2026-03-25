@@ -82,7 +82,7 @@ struct MainWindowView: View {
                     .font(.title2)
                     .foregroundStyle(NimbusGradients.primary)
                 Text("NimbusGlide")
-                    .font(.headline.weight(.bold))
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundColor(NimbusColors.heading)
 
                 if usageTracker.isPro {
@@ -116,14 +116,14 @@ struct MainWindowView: View {
                     Button(action: { selectedItem = item }) {
                         HStack(spacing: 8) {
                             Image(systemName: item.icon)
-                                .font(.body)
+                                .font(.system(size: 14))
                                 .frame(width: 22)
                             Text(item.rawValue)
-                                .font(.body)
+                                .font(.system(size: 14))
                             Spacer()
                         }
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 10)
                         .background(selectedItem == item ? Color.accentColor.opacity(0.15) : Color.clear)
                         .cornerRadius(6)
                         .foregroundColor(selectedItem == item ? .accentColor : .primary)

@@ -67,10 +67,10 @@ struct SnippetsView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Snippets")
-                        .font(.title2.weight(.bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(NimbusColors.heading)
                     Text("Say a trigger phrase during dictation and NimbusGlide will expand it into the full text automatically.")
-                        .font(.caption)
+                        .font(.system(size: 12))
                         .foregroundColor(NimbusColors.muted)
                         .lineSpacing(2)
                 }
@@ -107,10 +107,10 @@ struct SnippetsView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("\"\(snippet.trigger)\"")
-                                    .font(.body.weight(.semibold))
+                                    .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(NimbusColors.violet)
                                 Text(snippet.expansion)
-                                    .font(.body)
+                                    .font(.system(size: 14))
                                     .foregroundColor(NimbusColors.body)
                                     .lineLimit(2)
                             }
@@ -121,12 +121,12 @@ struct SnippetsView: View {
                                 }
                             }) {
                                 Image(systemName: "trash")
-                                    .font(.callout)
+                                    .font(.system(size: 14))
                                     .foregroundColor(.red.opacity(0.6))
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 6)
                     }
                     .onDelete { offsets in
                         snippetsManager.delete(at: offsets)

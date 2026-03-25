@@ -73,10 +73,10 @@ struct DictionaryView: View {
             // Header
             VStack(alignment: .leading, spacing: 6) {
                 Text("Dictionary")
-                    .font(.title2.weight(.bold))
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundColor(NimbusColors.heading)
                 Text("Add words and phrases that NimbusGlide frequently gets wrong. These corrections are applied automatically after every dictation.")
-                    .font(.caption)
+                    .font(.system(size: 12))
                     .foregroundColor(NimbusColors.muted)
                     .lineSpacing(2)
             }
@@ -124,14 +124,14 @@ struct DictionaryView: View {
                     ForEach(dictionaryManager.entries) { entry in
                         HStack {
                             Text(entry.wrong)
-                                .font(.body)
+                                .font(.system(size: 14))
                                 .foregroundColor(NimbusColors.error)
                                 .strikethrough()
                             Image(systemName: "arrow.right")
-                                .font(.caption)
+                                .font(.system(size: 12))
                                 .foregroundColor(NimbusColors.muted)
                             Text(entry.correct)
-                                .font(.body.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(NimbusColors.ready)
                             Spacer()
                             Button(action: {
@@ -140,12 +140,12 @@ struct DictionaryView: View {
                                 }
                             }) {
                                 Image(systemName: "trash")
-                                    .font(.callout)
+                                    .font(.system(size: 14))
                                     .foregroundColor(.red.opacity(0.6))
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 6)
                     }
                     .onDelete { offsets in
                         dictionaryManager.delete(at: offsets)

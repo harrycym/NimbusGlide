@@ -2,7 +2,7 @@ import Cocoa
 import Carbon
 
 enum HotkeyChoice: String, CaseIterable, Identifiable, Codable {
-    case fn     = "fn Globe 🌐"
+    case fn     = "fn 🌐"
     case custom = "Custom Key…"
 
     var id: String { rawValue }

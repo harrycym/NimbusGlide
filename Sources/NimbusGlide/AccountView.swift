@@ -24,11 +24,11 @@ struct AccountView: View {
                             )
                     }
 
-                    VStack(spacing: 4) {
+                    VStack(spacing: 6) {
                         Text(authManager.currentUser?.displayName ?? "User")
-                            .font(.title3.weight(.semibold))
+                            .font(.system(size: 18, weight: .semibold))
                         Text(authManager.currentUser?.email ?? "")
-                            .font(.callout)
+                            .font(.system(size: 14))
                             .foregroundColor(.secondary)
                     }
 
@@ -38,13 +38,13 @@ struct AccountView: View {
 
                 // Plan card
                 GroupBox {
-                    VStack(spacing: 14) {
+                    VStack(spacing: 16) {
                         HStack {
                             Label("Plan", systemImage: "creditcard")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                             Spacer()
                             Text(usageTracker.isPro ? "Pro" : "Free")
-                                .font(.callout.weight(.semibold))
+                                .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
 
@@ -52,17 +52,17 @@ struct AccountView: View {
 
                         HStack {
                             Label("Words used", systemImage: "text.word.spacing")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                             Spacer()
                             if usageTracker.isPro {
                                 Text("\(usageTracker.totalWordsUsed.formatted())")
-                                    .font(.callout.weight(.medium))
+                                    .font(.system(size: 14, weight: .medium))
                                 + Text("  unlimited")
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(.secondary)
                             } else if let limit = usageTracker.wordLimit {
                                 Text("\(usageTracker.totalWordsUsed.formatted()) / \(limit.formatted())")
-                                    .font(.callout.weight(.medium))
+                                    .font(.system(size: 14, weight: .medium))
                             }
                         }
 
@@ -74,7 +74,7 @@ struct AccountView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "bolt.fill")
                                     Text("Upgrade to Pro — from $3/mo")
-                                        .font(.callout.weight(.semibold))
+                                        .font(.system(size: 14, weight: .semibold))
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
@@ -88,43 +88,43 @@ struct AccountView: View {
 
                 // Plan limits
                 GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 12) {
                         Label("Plan Limits", systemImage: "list.bullet")
-                            .font(.callout.weight(.medium))
+                            .font(.system(size: 14, weight: .medium))
 
                         HStack {
                             Text("Words per Month")
-                                .font(.callout)
+                                .font(.system(size: 14))
                             Spacer()
                             Text(usageTracker.isPro ? "Unlimited" : "\(usageTracker.wordLimit?.formatted() ?? "2,000")")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
                         Divider()
                         HStack {
                             Text("Max Dictation Length")
-                                .font(.callout)
+                                .font(.system(size: 14))
                             Spacer()
                             Text(usageTracker.isPro ? "15 minutes" : "5 minutes")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
                         Divider()
                         HStack {
                             Text("Profiles")
-                                .font(.callout)
+                                .font(.system(size: 14))
                             Spacer()
                             Text(usageTracker.isPro ? "Unlimited" : "5 max")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
                         Divider()
                         HStack {
                             Text("Languages")
-                                .font(.callout)
+                                .font(.system(size: 14))
                             Spacer()
                             Text(usageTracker.isPro ? "Unlimited (auto-detect)" : "1 language")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
                     }
@@ -143,7 +143,7 @@ struct AccountView: View {
                                     Image(systemName: "globe")
                                         .frame(width: 24)
                                     Text("Manage Subscription")
-                                        .font(.callout)
+                                        .font(.system(size: 14))
                                     Spacer()
                                     Text("Opens browser")
                                         .font(.caption2)

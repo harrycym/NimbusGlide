@@ -116,7 +116,7 @@ struct HotkeyRecorderRow: View {
         case 58, 61:  return "Option ⌥"      // Left/Right Option
         case 55, 54:  return "Command ⌘"     // Left/Right Command
         case 57:      return "Caps Lock ⇪"
-        case 63:      return "fn Globe 🌐"
+        case 63:      return "fn 🌐"
         default:      return nil
         }
     }

@@ -9,15 +9,15 @@ struct AppSettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 24) {
                 // Hotkey
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
                         Label("Hotkey", systemImage: "keyboard")
-                            .font(.headline)
+                            .font(.system(size: 15, weight: .semibold))
 
                         Text("Hold this key to dictate, release to process.")
-                            .font(.caption)
+                            .font(.system(size: 12))
                             .foregroundColor(.secondary)
 
                         Picker("", selection: $settingsManager.hotkey) {
@@ -40,7 +40,7 @@ struct AppSettingsView: View {
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
                         Label("Permissions", systemImage: "lock.shield")
-                            .font(.headline)
+                            .font(.system(size: 15, weight: .semibold))
 
                         PermissionRow(
                             name: "Microphone",
@@ -71,13 +71,14 @@ struct AppSettingsView: View {
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
                         Label("Appearance", systemImage: "paintbrush")
-                            .font(.headline)
+                            .font(.system(size: 15, weight: .semibold))
 
                         Toggle(isOn: $settingsManager.showStatusIndicator) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Floating status indicator")
+                                    .font(.system(size: 14))
                                 Text("Shows a small pill at the bottom center when recording or processing")
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(.secondary)
                             }
                         }
@@ -89,15 +90,15 @@ struct AppSettingsView: View {
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
                         Label("Language", systemImage: "globe")
-                            .font(.headline)
+                            .font(.system(size: 15, weight: .semibold))
 
                         if usageTracker.isPro {
                             Text("Select which languages the AI may respond in. Multi-language support auto-detects and responds in the matching language.")
-                                .font(.caption)
+                                .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                         } else {
                             Text("Choose your dictation language. You can switch anytime — free tier supports one language at a time. Upgrade to Pro for multi-language.")
-                                .font(.caption)
+                                .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                         }
 
@@ -122,7 +123,7 @@ struct AppSettingsView: View {
                                         }
                                     }
                                 ))
-                                .font(.callout)
+                                .font(.system(size: 14))
                             }
                         }
                     }
@@ -142,19 +143,19 @@ struct AppSettingsView: View {
                 GroupBox {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Usage", systemImage: "chart.bar")
-                            .font(.headline)
+                            .font(.system(size: 15, weight: .semibold))
 
                         HStack {
                             Text("\(usageTracker.totalWordsUsed.formatted()) words used")
-                                .font(.callout)
+                                .font(.system(size: 14))
                             Spacer()
                             if usageTracker.isPro {
                                 Label("Pro", systemImage: "checkmark.seal.fill")
-                                    .font(.caption.weight(.medium))
+                                    .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(.accentColor)
                             } else if let limit = usageTracker.wordLimit {
                                 Text("\(max(0, limit - usageTracker.totalWordsUsed).formatted()) remaining")
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(.secondary)
                             }
                         }
@@ -173,9 +174,9 @@ struct AppSettingsView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("NimbusGlide")
-                                .font(.callout.weight(.medium))
+                                .font(.system(size: 14, weight: .medium))
                             Text("Version \(UpdateChecker.currentVersion)")
-                                .font(.caption)
+                                .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
