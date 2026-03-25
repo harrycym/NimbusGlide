@@ -4,7 +4,7 @@ import AppKit
 import Sparkle
 
 class UpdateChecker: ObservableObject {
-    static let currentVersion = "1.4.1"
+    static let currentVersion = "1.4.2"
 
     let updaterController: SPUStandardUpdaterController
 

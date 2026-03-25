@@ -8,6 +8,7 @@ struct NimbusGlideApp: App {
     var body: some Scene {
         Window("NimbusGlide", id: "main") {
             MainWindowView()
+                .preferredColorScheme(.light)
                 .environmentObject(appDelegate.pipelineState)
                 .environmentObject(appDelegate.profileManager)
                 .environmentObject(appDelegate.memoryManager)
