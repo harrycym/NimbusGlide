@@ -93,28 +93,19 @@ struct AccountView: View {
                             .font(.callout.weight(.medium))
 
                         HStack {
-                            Text("Max dictation length")
-                                .font(.callout)
-                            Spacer()
-                            Text(usageTracker.isPro ? "15 minutes" : "5 minutes")
-                                .font(.callout.weight(.medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
-                        Divider()
-                        HStack {
-                            Text("Languages")
-                                .font(.callout)
-                            Spacer()
-                            Text(usageTracker.isPro ? "Unlimited (auto-detect)" : "1 language")
-                                .font(.callout.weight(.medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
-                        Divider()
-                        HStack {
-                            Text("Words per month")
+                            Text("Words per Month")
                                 .font(.callout)
                             Spacer()
                             Text(usageTracker.isPro ? "Unlimited" : "\(usageTracker.wordLimit?.formatted() ?? "2,000")")
+                                .font(.callout.weight(.medium))
+                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
+                        }
+                        Divider()
+                        HStack {
+                            Text("Max Dictation Length")
+                                .font(.callout)
+                            Spacer()
+                            Text(usageTracker.isPro ? "15 minutes" : "5 minutes")
                                 .font(.callout.weight(.medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
@@ -124,6 +115,15 @@ struct AccountView: View {
                                 .font(.callout)
                             Spacer()
                             Text(usageTracker.isPro ? "Unlimited" : "5 max")
+                                .font(.callout.weight(.medium))
+                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
+                        }
+                        Divider()
+                        HStack {
+                            Text("Languages")
+                                .font(.callout)
+                            Spacer()
+                            Text(usageTracker.isPro ? "Unlimited (auto-detect)" : "1 language")
                                 .font(.callout.weight(.medium))
                                 .foregroundColor(usageTracker.isPro ? .purple : .secondary)
                         }
