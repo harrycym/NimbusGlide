@@ -1,10 +1,64 @@
 import SwiftUI
 
+struct DictionaryEntry: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var wrong: String
+    var correct: String
+}
+
+class DictionaryManager: ObservableObject {
+    private static let storageKey = "nimbusglide_dictionary"
+
+    @Published var entries: [DictionaryEntry] {
+        didSet { save() }
+    }
+
+    init() {
+        if let data = UserDefaults.standard.data(forKey: Self.storageKey),
+           let decoded = try? JSONDecoder().decode([DictionaryEntry].self, from: data) {
+            self.entries = decoded
+        } else {
+            self.entries = []
+        }
+    }
+
+    private func save() {
+        if let data = try? JSONEncoder().encode(entries) {
+            UserDefaults.standard.set(data, forKey: Self.storageKey)
+        }
+    }
+
+    func add(wrong: String, correct: String) {
+        entries.insert(DictionaryEntry(wrong: wrong, correct: correct), at: 0)
+    }
+
+    func delete(at offsets: IndexSet) {
+        entries.remove(atOffsets: offsets)
+    }
+
+    /// Applies all dictionary corrections to the text.
+    /// Case-insensitive word boundary matching.
+    func applyCorrections(_ text: String) -> String {
+        var result = text
+        for entry in entries {
+            // Use word boundary regex for accurate replacement
+            if let regex = try? NSRegularExpression(
+                pattern: "\\b\(NSRegularExpression.escapedPattern(for: entry.wrong))\\b",
+                options: .caseInsensitive
+            ) {
+                result = regex.stringByReplacingMatches(
+                    in: result,
+                    range: NSRange(result.startIndex..., in: result),
+                    withTemplate: entry.correct
+                )
+            }
+        }
+        return result
+    }
+}
+
 struct DictionaryView: View {
-    @State private var entries: [(wrong: String, correct: String)] = [
-        (wrong: "nimble slide", correct: "NimbusGlide"),
-        (wrong: "whisper flow", correct: "WhisperFlow"),
-    ]
+    @EnvironmentObject var dictionaryManager: DictionaryManager
     @State private var newWrong = ""
     @State private var newCorrect = ""
 
@@ -43,36 +97,53 @@ struct DictionaryView: View {
             }
             .padding(NimbusLayout.contentPadding)
 
-            // Entries list
-            List {
-                ForEach(entries.indices, id: \.self) { i in
-                    HStack {
-                        Text(entries[i].wrong)
-                            .font(.body)
-                            .foregroundColor(NimbusColors.error)
-                            .strikethrough()
-                        Image(systemName: "arrow.right")
-                            .font(.caption)
-                            .foregroundColor(NimbusColors.muted)
-                        Text(entries[i].correct)
-                            .font(.body.weight(.medium))
-                            .foregroundColor(NimbusColors.ready)
-                        Spacer()
+            if dictionaryManager.entries.isEmpty {
+                VStack(spacing: 12) {
+                    Spacer()
+                    Image(systemName: "character.book.closed")
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundStyle(NimbusGradients.primary)
+                    Text("No corrections yet")
+                        .font(.callout.weight(.medium))
+                        .foregroundColor(NimbusColors.heading)
+                    Text("Add words that get misheard during dictation.")
+                        .font(.caption)
+                        .foregroundColor(NimbusColors.muted)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+            } else {
+                // Entries list
+                List {
+                    ForEach(dictionaryManager.entries) { entry in
+                        HStack {
+                            Text(entry.wrong)
+                                .font(.body)
+                                .foregroundColor(NimbusColors.error)
+                                .strikethrough()
+                            Image(systemName: "arrow.right")
+                                .font(.caption)
+                                .foregroundColor(NimbusColors.muted)
+                            Text(entry.correct)
+                                .font(.body.weight(.medium))
+                                .foregroundColor(NimbusColors.ready)
+                            Spacer()
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    .onDelete { offsets in
+                        dictionaryManager.delete(at: offsets)
+                    }
                 }
-                .onDelete { offsets in
-                    entries.remove(atOffsets: offsets)
-                }
+                .listStyle(.inset)
             }
-            .listStyle(.inset)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(NimbusColors.warmBg)
     }
 
     private func addEntry() {
-        entries.insert((wrong: newWrong, correct: newCorrect), at: 0)
+        dictionaryManager.add(wrong: newWrong, correct: newCorrect)
         newWrong = ""
         newCorrect = ""
     }

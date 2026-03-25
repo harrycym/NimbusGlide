@@ -9,7 +9,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     case home = "Home"
     case dictionary = "Dictionary"
     case snippets = "Snippets"
-    case style = "Style"
+    case style = "Profile"
     case settings = "Settings"
     case account = "Account"
 
@@ -35,6 +35,8 @@ struct MainWindowView: View {
     @EnvironmentObject var usageTracker: UsageTracker
     @EnvironmentObject var updateChecker: UpdateChecker
     @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var snippetsManager: SnippetsManager
+    @EnvironmentObject var dictionaryManager: DictionaryManager
 
     @State private var selectedItem: SidebarItem = .home
     @AppStorage("nimbusglide_onboarding_complete") private var hasCompletedOnboarding = false
@@ -122,8 +124,10 @@ struct MainWindowView: View {
                 .environmentObject(authManager)
         case .dictionary:
             DictionaryView()
+                .environmentObject(dictionaryManager)
         case .snippets:
             SnippetsView()
+                .environmentObject(snippetsManager)
         case .style:
             ProfilesView()
                 .environmentObject(profileManager)

@@ -56,14 +56,14 @@ struct UpgradeView: View {
                 .padding(.horizontal, 20)
 
                 // Features
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 5) {
                     featureRow(icon: "infinity",              "Unlimited dictation")
                     featureRow(icon: "sparkles",              "Best AI model")
                     featureRow(icon: "person.text.rectangle", "Custom profiles")
                     featureRow(icon: "bolt.fill",             "Priority processing")
                 }
-                .padding(.horizontal, 28)
-                .padding(.top, 18)
+                .padding(.top, 16)
+                .frame(maxWidth: .infinity, alignment: .center)
 
                 Spacer()
 
@@ -190,17 +190,17 @@ struct UpgradeView: View {
     }
 
     private func featureRow(icon: String, _ text: String) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(LinearGradient(
                     colors: [Color(red: 0.38, green: 0.20, blue: 0.92), Color(red: 0.62, green: 0.18, blue: 0.95)],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ))
-                .frame(width: 18)
+                .frame(width: 14, alignment: .center)
             Text(text)
-                .font(.callout)
-                .foregroundColor(Color(red: 0.25, green: 0.2, blue: 0.35))
+                .font(.caption)
+                .foregroundColor(Color(red: 0.3, green: 0.25, blue: 0.4))
         }
     }
 

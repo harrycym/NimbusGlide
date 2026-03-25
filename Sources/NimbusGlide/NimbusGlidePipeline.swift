@@ -8,6 +8,8 @@ class NimbusGlidePipeline {
     private let keystrokeSimulator: KeystrokeSimulator
     private let profileManager: ProfileManager
     private let memoryManager: MemoryManager
+    private let snippetsManager: SnippetsManager
+    private let dictionaryManager: DictionaryManager
 
     private var isProcessing = false
     weak var menuBarManager: MenuBarManager?
@@ -23,7 +25,9 @@ class NimbusGlidePipeline {
         appTracker: AppTracker,
         keystrokeSimulator: KeystrokeSimulator,
         profileManager: ProfileManager,
-        memoryManager: MemoryManager
+        memoryManager: MemoryManager,
+        snippetsManager: SnippetsManager,
+        dictionaryManager: DictionaryManager
     ) {
         self.audioRecorder = audioRecorder
         self.aiService = aiService
@@ -31,6 +35,8 @@ class NimbusGlidePipeline {
         self.keystrokeSimulator = keystrokeSimulator
         self.profileManager = profileManager
         self.memoryManager = memoryManager
+        self.snippetsManager = snippetsManager
+        self.dictionaryManager = dictionaryManager
     }
 
     func toggleRecording() {
@@ -118,23 +124,27 @@ class NimbusGlidePipeline {
                     return
                 }
 
+                // Apply dictionary corrections and snippet expansions
+                var finalText = self.dictionaryManager.applyCorrections(result)
+                finalText = self.snippetsManager.expand(finalText)
+
                 // Save to memory for few-shot learning
                 await MainActor.run {
-                    memoryManager.addEntry(rawTranscript: transcript, polishedText: result)
-                    pipelineState?.recordSuccess(transcript: transcript, result: result)
+                    memoryManager.addEntry(rawTranscript: transcript, polishedText: finalText)
+                    pipelineState?.recordSuccess(transcript: transcript, result: finalText)
                 }
 
                 // Auto-copy to clipboard if enabled
                 if self.settingsManager?.autoCopyToClipboard == true {
                     await MainActor.run {
                         NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(result, forType: .string)
+                        NSPasteboard.general.setString(finalText, forType: .string)
                     }
                 }
 
                 // Paste into frontmost app
                 await MainActor.run {
-                    keystrokeSimulator.pasteText(result)
+                    keystrokeSimulator.pasteText(finalText)
                 }
 
                 await finish(status: .idle)

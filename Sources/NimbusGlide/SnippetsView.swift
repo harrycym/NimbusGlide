@@ -1,10 +1,58 @@
 import SwiftUI
 
+struct Snippet: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var trigger: String
+    var expansion: String
+}
+
+class SnippetsManager: ObservableObject {
+    private static let storageKey = "nimbusglide_snippets"
+
+    @Published var snippets: [Snippet] {
+        didSet { save() }
+    }
+
+    init() {
+        if let data = UserDefaults.standard.data(forKey: Self.storageKey),
+           let decoded = try? JSONDecoder().decode([Snippet].self, from: data) {
+            self.snippets = decoded
+        } else {
+            self.snippets = []
+        }
+    }
+
+    private func save() {
+        if let data = try? JSONEncoder().encode(snippets) {
+            UserDefaults.standard.set(data, forKey: Self.storageKey)
+        }
+    }
+
+    func add(trigger: String, expansion: String) {
+        snippets.insert(Snippet(trigger: trigger, expansion: expansion), at: 0)
+    }
+
+    func delete(at offsets: IndexSet) {
+        snippets.remove(atOffsets: offsets)
+    }
+
+    /// Expands any snippet triggers found in the text.
+    /// Case-insensitive matching.
+    func expand(_ text: String) -> String {
+        var result = text
+        for snippet in snippets {
+            // Case-insensitive replace
+            let range = result.range(of: snippet.trigger, options: .caseInsensitive)
+            if let range {
+                result.replaceSubrange(range, with: snippet.expansion)
+            }
+        }
+        return result
+    }
+}
+
 struct SnippetsView: View {
-    @State private var snippets: [Snippet] = [
-        Snippet(trigger: "my email", expansion: "harry@nimbusglide.ai"),
-        Snippet(trigger: "my address", expansion: "123 Innovation Drive, San Francisco, CA 94105"),
-    ]
+    @EnvironmentObject var snippetsManager: SnippetsManager
     @State private var showAddSheet = false
 
     var body: some View {
@@ -32,7 +80,7 @@ struct SnippetsView: View {
 
             Divider()
 
-            if snippets.isEmpty {
+            if snippetsManager.snippets.isEmpty {
                 VStack(spacing: 12) {
                     Spacer()
                     Image(systemName: "bolt.fill")
@@ -49,10 +97,10 @@ struct SnippetsView: View {
                 .frame(maxWidth: .infinity)
             } else {
                 List {
-                    ForEach(snippets) { snippet in
+                    ForEach(snippetsManager.snippets) { snippet in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text("\"\\(snippet.trigger)\"")
+                                Text("\"\(snippet.trigger)\"")
                                     .font(.callout.weight(.semibold))
                                     .foregroundColor(NimbusColors.violet)
                                 Spacer()
@@ -65,7 +113,7 @@ struct SnippetsView: View {
                         .padding(.vertical, 4)
                     }
                     .onDelete { offsets in
-                        snippets.remove(atOffsets: offsets)
+                        snippetsManager.delete(at: offsets)
                     }
                 }
                 .listStyle(.inset)
@@ -74,19 +122,14 @@ struct SnippetsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(NimbusColors.warmBg)
         .sheet(isPresented: $showAddSheet) {
-            AddSnippetView(snippets: $snippets, isPresented: $showAddSheet)
+            AddSnippetView(isPresented: $showAddSheet)
+                .environmentObject(snippetsManager)
         }
     }
 }
 
-struct Snippet: Identifiable {
-    let id = UUID()
-    var trigger: String
-    var expansion: String
-}
-
 private struct AddSnippetView: View {
-    @Binding var snippets: [Snippet]
+    @EnvironmentObject var snippetsManager: SnippetsManager
     @Binding var isPresented: Bool
     @State private var trigger = ""
     @State private var expansion = ""
@@ -115,7 +158,7 @@ private struct AddSnippetView: View {
                     .keyboardShortcut(.cancelAction)
                 Spacer()
                 Button("Add") {
-                    snippets.insert(Snippet(trigger: trigger, expansion: expansion), at: 0)
+                    snippetsManager.add(trigger: trigger, expansion: expansion)
                     isPresented = false
                 }
                 .buttonStyle(.borderedProminent)

@@ -6,17 +6,17 @@
     <description>NimbusGlide update feed</description>
     <language>en</language>
     <item>
-      <title>NimbusGlide 1.1.3</title>
-      <description><![CDATA[<p>Fix unsupported URL error, better auth error messages, auto-signout on expired session</p>]]></description>
-      <pubDate>Wed, 25 Mar 2026 12:29:27 +0000</pubDate>
-      <sparkle:version>1.1.3</sparkle:version>
-      <sparkle:shortVersionString>1.1.3</sparkle:shortVersionString>
+      <title>NimbusGlide 1.2.0</title>
+      <description><![CDATA[<p>Rename Style to Profile, persistent Snippets and Dictionary with pipeline integration, better auth error messages, auto-signout on expired session</p>]]></description>
+      <pubDate>Wed, 25 Mar 2026 12:41:16 +0000</pubDate>
+      <sparkle:version>1.2.0</sparkle:version>
+      <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/harrycym/NimbusGlide/releases/download/v1.1.3/NimbusGlide.zip"
-        length="2969462"
+        url="https://github.com/harrycym/NimbusGlide/releases/download/v1.2.0/NimbusGlide.zip"
+        length="2991026"
         type="application/octet-stream"
-        sparkle:edSignature="E6y341rdvuRldOw/ZavTGx3Sv2KBZawDQGprokbkp86GfpTVN1SOdE85Y3mjV4j0EElt00Mh0I3/772asMeDDg=="
+        sparkle:edSignature="G3eGaAAhSs/Ygy8i0aQlTeFWjgWnzeJSU+7m76Jssyaq4CLfrGkPhNM5OABkQd0P+F33/5WsRESvyh9pYeOmCA=="
       />
     </item>
   </channel>

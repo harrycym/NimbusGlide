@@ -15,6 +15,8 @@ struct NimbusGlideApp: App {
                 .environmentObject(appDelegate.updateChecker)
                 .environmentObject(appDelegate.usageTracker)
                 .environmentObject(appDelegate.authManager)
+                .environmentObject(appDelegate.snippetsManager)
+                .environmentObject(appDelegate.dictionaryManager)
                 .onOpenURL { url in
                     appDelegate.authManager.handleCallback(url: url)
                 }

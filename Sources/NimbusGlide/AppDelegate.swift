@@ -13,6 +13,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let profileManager = ProfileManager()
     let memoryManager = MemoryManager()
     let settingsManager = SettingsManager()
+    let snippetsManager = SnippetsManager()
+    let dictionaryManager = DictionaryManager()
     let pipelineState = PipelineState()
     let updateChecker = UpdateChecker()
     let usageTracker = UsageTracker()
@@ -76,7 +78,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             appTracker: appTracker,
             keystrokeSimulator: keystrokeSimulator,
             profileManager: profileManager,
-            memoryManager: memoryManager
+            memoryManager: memoryManager,
+            snippetsManager: snippetsManager,
+            dictionaryManager: dictionaryManager
         )
 
         menuBarManager = MenuBarManager(pipeline: pipeline, settingsManager: settingsManager, profileManager: profileManager)
