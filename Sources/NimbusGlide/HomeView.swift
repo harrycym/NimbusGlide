@@ -306,8 +306,8 @@ struct HomeView: View {
             }
             .frame(minHeight: 80, alignment: .topLeading)
         }
-        .nimbusCard()
         .padding(16)
+        .nimbusCard()
     }
 
     private func copyResult() {
