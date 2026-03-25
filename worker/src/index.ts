@@ -56,10 +56,46 @@ export default {
 };
 
 // ============================================================
+// USAGE CHECK (fast Supabase REST call)
+// ============================================================
+
+async function checkUsageLimit(env: Env, userId: string): Promise<{ allowed: boolean; wordsUsed: number; wordLimit: number | null }> {
+  try {
+    const resp = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&select=words_used,word_limit,plan`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      }
+    );
+    const rows = (await resp.json()) as { words_used: number; word_limit: number | null; plan: string }[];
+    if (!rows?.[0]) return { allowed: true, wordsUsed: 0, wordLimit: 2000 }; // no subscription = allow (new user)
+
+    const { words_used, word_limit } = rows[0];
+    if (word_limit === null) return { allowed: true, wordsUsed: words_used, wordLimit: null }; // pro = unlimited
+    return { allowed: words_used < word_limit, wordsUsed: words_used, wordLimit: word_limit };
+  } catch {
+    return { allowed: true, wordsUsed: 0, wordLimit: 2000 }; // on error, allow (don't block paying users)
+  }
+}
+
+// ============================================================
 // TRANSCRIBE
 // ============================================================
 
 async function handleTranscribe(request: Request, env: Env, userId: string): Promise<Response> {
+  // Check usage limit before wasting a Groq call
+  const usage = await checkUsageLimit(env, userId);
+  if (!usage.allowed) {
+    return jsonResponse({
+      error: "usage_limit_reached",
+      words_used: usage.wordsUsed,
+      word_limit: usage.wordLimit,
+    }, 403);
+  }
+
   const formData = await request.formData();
   const audioFile = formData.get("file");
   if (!audioFile || !(audioFile instanceof File)) {
@@ -91,6 +127,16 @@ async function handleTranscribe(request: Request, env: Env, userId: string): Pro
 // ============================================================
 
 async function handleProcess(request: Request, env: Env, userId: string): Promise<Response> {
+  // Check usage limit
+  const usage = await checkUsageLimit(env, userId);
+  if (!usage.allowed) {
+    return jsonResponse({
+      error: "usage_limit_reached",
+      words_used: usage.wordsUsed,
+      word_limit: usage.wordLimit,
+    }, 403);
+  }
+
   const body = (await request.json()) as Record<string, unknown>;
   const { model, messages, temperature, max_tokens } = body;
 
