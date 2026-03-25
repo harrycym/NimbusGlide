@@ -102,8 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
         hotkeyManager.customKeyCode = settingsManager.customKeyCode
 
-        // Check for updates
-        updateChecker.checkForUpdate()
+        // Sparkle handles automatic update checks
 
         // Auto-show main window on launch
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

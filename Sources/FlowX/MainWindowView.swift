@@ -29,6 +29,7 @@ struct MainWindowView: View {
     @EnvironmentObject var memoryManager: MemoryManager
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var usageTracker: UsageTracker
+    @EnvironmentObject var updateChecker: UpdateChecker
 
     @State private var selectedItem: SidebarItem = .home
     @AppStorage("flowx_onboarding_complete") private var hasCompletedOnboarding = false
@@ -92,6 +93,7 @@ struct MainWindowView: View {
                 .environmentObject(settingsManager)
                 .environmentObject(pipelineState)
                 .environmentObject(usageTracker)
+                .environmentObject(updateChecker)
         }
     }
 }

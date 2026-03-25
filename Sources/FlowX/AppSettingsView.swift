@@ -4,6 +4,7 @@ struct AppSettingsView: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var pipelineState: PipelineState
     @EnvironmentObject var usageTracker: UsageTracker
+    @EnvironmentObject var updateChecker: UpdateChecker
 
     var body: some View {
         ScrollView {
@@ -94,17 +95,25 @@ struct AppSettingsView: View {
                     .padding(4)
                 }
 
-                // About
+                // About & Updates
                 GroupBox {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("FlowX")
-                                .font(.callout.weight(.medium))
-                            Text("Version \(UpdateChecker.currentVersion)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("FlowX")
+                                    .font(.callout.weight(.medium))
+                                Text("Version \(UpdateChecker.currentVersion)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button("Check for Updates") {
+                                updateChecker.checkForUpdates()
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .disabled(!updateChecker.canCheckForUpdates)
                         }
-                        Spacer()
                     }
                     .padding(4)
                 }

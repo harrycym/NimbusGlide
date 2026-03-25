@@ -59,6 +59,7 @@ class FlowXPipeline {
 
         DispatchQueue.main.async {
             self.pipelineState?.status = .recording
+            CursorManager.showMicCursor()
         }
     }
 
@@ -78,6 +79,7 @@ class FlowXPipeline {
         isProcessing = true
 
         DispatchQueue.main.async {
+            CursorManager.restoreCursor()
             self.pipelineState?.status = .processing
         }
 
