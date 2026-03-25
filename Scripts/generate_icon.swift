@@ -59,10 +59,10 @@ func renderIcon(size: CGFloat) -> NSImage {
     ctx.addPath(bgPath)
     ctx.clip()
 
-    // Deep purple to indigo gradient
+    // Dark cinematic gradient for a premium commercial look
     let colors = [
-        CGColor(red: 0.25, green: 0.10, blue: 0.55, alpha: 1.0),
-        CGColor(red: 0.10, green: 0.05, blue: 0.35, alpha: 1.0),
+        CGColor(red: 0.05, green: 0.05, blue: 0.08, alpha: 1.0),
+        CGColor(red: 0.20, green: 0.05, blue: 0.40, alpha: 1.0),
     ]
     let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
                                colors: colors as CFArray, locations: [0, 1])!
@@ -70,33 +70,46 @@ func renderIcon(size: CGFloat) -> NSImage {
                            end: CGPoint(x: size, y: 0), options: [])
     ctx.restoreGState()
 
-    // Draw waveform bars in the center
-    let barCount = 5
-    let centerY = size * 0.5
-    let totalWidth = size * 0.50
-    let barWidth = totalWidth / CGFloat(barCount * 2 - 1)
-    let startX = (size - totalWidth) / 2.0
-
-    let barHeights: [CGFloat] = [0.18, 0.35, 0.50, 0.35, 0.18]
-
-    for i in 0..<barCount {
-        let x = startX + CGFloat(i) * barWidth * 2
-        let h = size * barHeights[i]
-        let y = centerY - h / 2
-
-        let barRect = CGRect(x: x, y: y, width: barWidth, height: h)
-        let barPath = CGPath(roundedRect: barRect, cornerWidth: barWidth / 2,
-                             cornerHeight: barWidth / 2, transform: nil)
-
-        // White bars with slight glow
-        ctx.saveGState()
-        ctx.setShadow(offset: .zero, blur: size * 0.03,
-                      color: CGColor(red: 0.6, green: 0.5, blue: 1.0, alpha: 0.8))
-        ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 0.95))
-        ctx.addPath(barPath)
-        ctx.fillPath()
-        ctx.restoreGState()
+    // Helper to draw a single 7-bar waveform
+    func drawWaveform(context: CGContext, canvasSize: CGFloat, alpha: CGFloat) {
+        let barCount = 7
+        let centerY = canvasSize * 0.5
+        let totalWidth = canvasSize * 0.65
+        let barWidth = totalWidth / CGFloat(barCount * 2 - 1)
+        let startX = (canvasSize - totalWidth) / 2.0
+        
+        let barHeights: [CGFloat] = [0.2, 0.4, 0.6, 0.8, 0.6, 0.4, 0.2]
+        
+        for i in 0..<barCount {
+            let x = startX + CGFloat(i) * barWidth * 2
+            let h = canvasSize * barHeights[i]
+            let y = centerY - h / 2
+            let barRect = CGRect(x: x, y: y, width: barWidth, height: h)
+            let barPath = CGPath(roundedRect: barRect, cornerWidth: barWidth / 2, cornerHeight: barWidth / 2, transform: nil)
+            
+            context.saveGState()
+            context.setShadow(offset: .zero, blur: canvasSize * 0.04, color: CGColor(red: 0.2, green: 0.8, blue: 1.0, alpha: 0.8))
+            context.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: alpha))
+            context.addPath(barPath)
+            context.fillPath()
+            context.restoreGState()
+        }
     }
+
+    // Draw two intersecting waveforms to form the "X"
+    ctx.saveGState()
+    ctx.translateBy(x: size / 2, y: size / 2)
+    ctx.rotate(by: .pi / 4) // 45 degrees
+    ctx.translateBy(x: -size / 2, y: -size / 2)
+    drawWaveform(context: ctx, canvasSize: size, alpha: 0.75)
+    ctx.restoreGState()
+    
+    ctx.saveGState()
+    ctx.translateBy(x: size / 2, y: size / 2)
+    ctx.rotate(by: -.pi / 4) // -45 degrees
+    ctx.translateBy(x: -size / 2, y: -size / 2)
+    drawWaveform(context: ctx, canvasSize: size, alpha: 0.95)
+    ctx.restoreGState()
 
     image.unlockFocus()
     return image
