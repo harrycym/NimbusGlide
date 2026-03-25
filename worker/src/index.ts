@@ -169,14 +169,64 @@ async function handleProcess(request: Request, env: Env, userId: string): Promis
   const resultText = groqJson.choices?.[0]?.message?.content?.trim() ?? "";
   const wordCount = resultText.split(/\s+/).filter((w) => w.length > 0).length;
 
-  // Report usage in background (non-blocking)
-  reportUsageAsync(env, userId, wordCount);
+  // Update usage SYNCHRONOUSLY before returning — so the next request sees the updated count
+  await updateUsageSync(env, userId, wordCount);
 
   return jsonResponse({ result: resultText, words: wordCount });
 }
 
 // ============================================================
-// USAGE REPORTING (fire-and-forget)
+// USAGE UPDATE (synchronous — must complete before response)
+// ============================================================
+
+async function updateUsageSync(env: Env, userId: string, words: number) {
+  try {
+    // Get current count
+    const resp = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&select=words_used`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      }
+    );
+    const rows = (await resp.json()) as { words_used: number }[];
+    const currentCount = rows?.[0]?.words_used ?? 0;
+    const newCount = currentCount + words;
+
+    // Update count
+    await fetch(
+      `${env.SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ words_used: newCount }),
+      }
+    );
+
+    // Log usage
+    await fetch(`${env.SUPABASE_URL}/rest/v1/usage_log`, {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id: userId, words, action: "dictation" }),
+    });
+  } catch {
+    // Don't block the response if usage tracking fails
+  }
+}
+
+// ============================================================
+// USAGE REPORTING (fire-and-forget — kept for transcribe endpoint)
 // ============================================================
 
 function reportUsageAsync(env: Env, userId: string, words: number) {
@@ -283,7 +333,57 @@ async function handleDemo(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ error: "No speech detected" }, 400);
   }
 
-  // Step 2: Polish with LLM
+  // Step 2: Detect wake word and process with LLM
+  // Check for "nimbus glide" or "nimbusglide" (case insensitive) in the transcript
+  const lowerTranscript = transcript.toLowerCase();
+  const wakePatterns = ["nimbus glide", "nimbusglide", "nimbus-glide"];
+  let wakeIndex = -1;
+  let wakeLength = 0;
+  for (const pattern of wakePatterns) {
+    const idx = lowerTranscript.indexOf(pattern);
+    if (idx !== -1) {
+      wakeIndex = idx;
+      wakeLength = pattern.length;
+      break;
+    }
+  }
+
+  let systemPrompt: string;
+  let userContent: string;
+
+  if (wakeIndex !== -1) {
+    // Split: content before wake word = context, after = command
+    const beforeWake = transcript.slice(0, wakeIndex).trim();
+    const afterWake = transcript.slice(wakeIndex + wakeLength).trim();
+    // Remove leading punctuation/comma from the command
+    const command = afterWake.replace(/^[,.\s]+/, "").trim();
+
+    systemPrompt = `You are NimbusGlide, an AI dictation assistant with a wake word feature.
+
+The user dictated some content, then said "NimbusGlide" followed by a formatting command.
+
+CONTENT (what the user dictated before the wake word):
+"${beforeWake}"
+
+COMMAND (what the user said after "NimbusGlide"):
+"${command}"
+
+Execute the command on the content. For example:
+- "draft this as an email" → reformat the content as a professional email
+- "make this an AI prompt" → reformat as a detailed AI prompt
+- "format as meeting notes" → reformat as structured meeting notes
+- "make this a Slack message" → reformat as a concise Slack message
+- "format as a clinical note" → reformat as a medical clinical note
+- Any other instruction → follow it faithfully
+
+Output ONLY the reformatted text. No explanations, no preamble.`;
+    userContent = beforeWake;
+  } else {
+    // No wake word — just polish
+    systemPrompt = "You are an expert transcription copyeditor. Fix stutters, filler words (um, uh, like), and grammar. Add proper punctuation and capitalization. Keep the original meaning and tone exactly. Output ONLY the polished text, nothing else.";
+    userContent = transcript;
+  }
+
   const processResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -295,19 +395,14 @@ async function handleDemo(request: Request, env: Env): Promise<Response> {
       temperature: 0.0,
       max_tokens: 1024,
       messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert transcription copyeditor. Fix stutters, filler words (um, uh, like), and grammar. Add proper punctuation and capitalization. Keep the original meaning and tone exactly. Output ONLY the polished text, nothing else.",
-        },
-        { role: "user", content: transcript },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
       ],
     }),
   });
 
   if (!processResp.ok) {
-    // If LLM fails, still return the raw transcript
-    return jsonResponse({ transcript, polished: transcript });
+    return jsonResponse({ transcript, polished: transcript, wakeWordDetected: wakeIndex !== -1 });
   }
 
   const processJson = (await processResp.json()) as {
@@ -315,7 +410,7 @@ async function handleDemo(request: Request, env: Env): Promise<Response> {
   };
   const polished = processJson.choices?.[0]?.message?.content?.trim() ?? transcript;
 
-  return jsonResponse({ transcript, polished });
+  return jsonResponse({ transcript, polished, wakeWordDetected: wakeIndex !== -1 });
 }
 
 // ============================================================
