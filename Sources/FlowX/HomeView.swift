@@ -48,6 +48,6 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut(duration: 0.25), value: pipelineState.errorMessage)
         .animation(.easeInOut(duration: 0.25), value: pipelineState.status)
-        .animation(.easeInOut(duration: 0.25), value: updateChecker.updateAvailable)
+        .animation(.easeInOut(duration: 0.25), value: updateChecker.updateAvailable as Bool)
     }
 }
