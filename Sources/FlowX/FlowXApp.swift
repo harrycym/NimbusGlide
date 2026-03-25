@@ -23,6 +23,8 @@ struct FlowXApp: App {
                 .environmentObject(appDelegate.memoryManager)
                 .environmentObject(appDelegate.settingsManager)
                 .environmentObject(appDelegate.updateChecker)
+                .environmentObject(appDelegate.pipelineState)
+                .environmentObject(appDelegate.usageTracker)
         }
     }
 }
