@@ -13,23 +13,19 @@ struct AccountView: View {
                 VStack(spacing: 16) {
                     ZStack {
                         Circle()
-                            .fill(
-                                LinearGradient(colors: [.purple.opacity(0.2), .blue.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                            )
+                            .fill(NimbusGradients.subtle)
                             .frame(width: 72, height: 72)
                         Text(initials)
                             .font(.title.weight(.semibold))
-                            .foregroundStyle(
-                                LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                            )
+                            .foregroundStyle(NimbusGradients.primary)
                     }
 
                     VStack(spacing: 6) {
                         Text(authManager.currentUser?.displayName ?? "User")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(NimbusFonts.pageTitle)
                         Text(authManager.currentUser?.email ?? "")
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
+                            .font(NimbusFonts.body)
+                            .foregroundColor(NimbusColors.muted)
                     }
 
                     planBadge
@@ -37,143 +33,141 @@ struct AccountView: View {
                 .padding(.top, 8)
 
                 // Plan card
-                GroupBox {
-                    VStack(spacing: 16) {
-                        HStack {
-                            Label("Plan", systemImage: "creditcard")
-                                .font(.system(size: 14, weight: .medium))
-                            Spacer()
-                            Text(usageTracker.isPro ? "Pro" : "Free")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
+                VStack(spacing: 16) {
+                    HStack {
+                        Label("Plan", systemImage: "creditcard")
+                            .font(NimbusFonts.bodyMedium)
+                        Spacer()
+                        Text(usageTracker.isPro ? "Pro" : "Free")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(usageTracker.isPro ? NimbusColors.violet : NimbusColors.muted)
+                    }
 
-                        Divider()
+                    Divider()
 
-                        HStack {
-                            Label("Words used", systemImage: "text.word.spacing")
-                                .font(.system(size: 14, weight: .medium))
-                            Spacer()
-                            if usageTracker.isPro {
-                                Text("\(usageTracker.totalWordsUsed.formatted())")
-                                    .font(.system(size: 14, weight: .medium))
-                                + Text("  unlimited")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                            } else if let limit = usageTracker.wordLimit {
-                                Text("\(usageTracker.totalWordsUsed.formatted()) / \(limit.formatted())")
-                                    .font(.system(size: 14, weight: .medium))
-                            }
-                        }
-
-                        if !usageTracker.isPro {
-                            ProgressView(value: usageTracker.usageRatio)
-                                .tint(usageTracker.usageRatio > 0.8 ? .orange : .purple)
-
-                            Button(action: { showUpgrade = true }) {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "bolt.fill")
-                                    Text("Upgrade to Pro — from $3/mo")
-                                        .font(.system(size: 14, weight: .semibold))
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.regular)
+                    HStack {
+                        Label("Words used", systemImage: "text.word.spacing")
+                            .font(NimbusFonts.bodyMedium)
+                        Spacer()
+                        if usageTracker.isPro {
+                            Text("\(usageTracker.totalWordsUsed.formatted())")
+                                .font(NimbusFonts.bodyMedium)
+                            + Text("  unlimited")
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.muted)
+                        } else if let limit = usageTracker.wordLimit {
+                            Text("\(usageTracker.totalWordsUsed.formatted()) / \(limit.formatted())")
+                                .font(NimbusFonts.bodyMedium)
                         }
                     }
-                    .padding(4)
+
+                    if !usageTracker.isPro {
+                        ProgressView(value: usageTracker.usageRatio)
+                            .tint(usageTracker.usageRatio > 0.8 ? NimbusColors.processing : NimbusColors.violet)
+
+                        Button(action: { showUpgrade = true }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "bolt.fill")
+                                Text("Upgrade to Pro — from $3/mo")
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                    }
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // Plan limits
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Plan Limits", systemImage: "list.bullet")
-                            .font(.system(size: 14, weight: .medium))
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Plan Limits", systemImage: "list.bullet")
+                        .font(NimbusFonts.bodyMedium)
 
-                        HStack {
-                            Text("Words per Month")
-                                .font(.system(size: 14))
-                            Spacer()
-                            Text(usageTracker.isPro ? "Unlimited" : "\(usageTracker.wordLimit?.formatted() ?? "2,000")")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
-                        Divider()
-                        HStack {
-                            Text("Max Dictation Length")
-                                .font(.system(size: 14))
-                            Spacer()
-                            Text(usageTracker.isPro ? "15 minutes" : "5 minutes")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
-                        Divider()
-                        HStack {
-                            Text("Profiles")
-                                .font(.system(size: 14))
-                            Spacer()
-                            Text(usageTracker.isPro ? "Unlimited" : "5 max")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
-                        Divider()
-                        HStack {
-                            Text("Languages")
-                                .font(.system(size: 14))
-                            Spacer()
-                            Text(usageTracker.isPro ? "Unlimited (auto-detect)" : "1 language")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(usageTracker.isPro ? .purple : .secondary)
-                        }
+                    HStack {
+                        Text("Words per Month")
+                            .font(NimbusFonts.body)
+                        Spacer()
+                        Text(usageTracker.isPro ? "Unlimited" : "\(usageTracker.wordLimit?.formatted() ?? "2,000")")
+                            .font(NimbusFonts.bodyMedium)
+                            .foregroundColor(usageTracker.isPro ? NimbusColors.violet : NimbusColors.muted)
                     }
-                    .padding(4)
+                    Divider()
+                    HStack {
+                        Text("Max Dictation Length")
+                            .font(NimbusFonts.body)
+                        Spacer()
+                        Text(usageTracker.isPro ? "15 minutes" : "5 minutes")
+                            .font(NimbusFonts.bodyMedium)
+                            .foregroundColor(usageTracker.isPro ? NimbusColors.violet : NimbusColors.muted)
+                    }
+                    Divider()
+                    HStack {
+                        Text("Profiles")
+                            .font(NimbusFonts.body)
+                        Spacer()
+                        Text(usageTracker.isPro ? "Unlimited" : "5 max")
+                            .font(NimbusFonts.bodyMedium)
+                            .foregroundColor(usageTracker.isPro ? NimbusColors.violet : NimbusColors.muted)
+                    }
+                    Divider()
+                    HStack {
+                        Text("Languages")
+                            .font(NimbusFonts.body)
+                        Spacer()
+                        Text(usageTracker.isPro ? "Unlimited (auto-detect)" : "1 language")
+                            .font(NimbusFonts.bodyMedium)
+                            .foregroundColor(usageTracker.isPro ? NimbusColors.violet : NimbusColors.muted)
+                    }
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // Actions
-                GroupBox {
-                    VStack(spacing: 0) {
-                        if usageTracker.isPro {
-                            Button(action: {
-                                // Opens Stripe billing portal in browser
-                                NSWorkspace.shared.open(URL(string: "https://nimbusglide.ai/account")!)
-                            }) {
-                                HStack {
-                                    Image(systemName: "globe")
-                                        .frame(width: 24)
-                                    Text("Manage Subscription")
-                                        .font(.system(size: 14))
-                                    Spacer()
-                                    Text("Opens browser")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                    Image(systemName: "arrow.up.forward")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(.vertical, 6)
-                            }
-                            .buttonStyle(.plain)
-
-                            Divider().padding(.vertical, 4)
-                        }
-
-                        Button(role: .destructive, action: { authManager.signOut() }) {
+                VStack(spacing: 0) {
+                    if usageTracker.isPro {
+                        Button(action: {
+                            // Opens Stripe billing portal in browser
+                            NSWorkspace.shared.open(URL(string: "https://nimbusglide.ai/account")!)
+                        }) {
                             HStack {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                Image(systemName: "globe")
                                     .frame(width: 24)
-                                Text("Sign Out")
+                                Text("Manage Subscription")
+                                    .font(NimbusFonts.body)
                                 Spacer()
+                                Text("Opens browser")
+                                    .font(NimbusFonts.caption)
+                                    .foregroundColor(NimbusColors.muted)
+                                Image(systemName: "arrow.up.forward")
+                                    .font(NimbusFonts.caption)
+                                    .foregroundColor(NimbusColors.muted)
                             }
                             .padding(.vertical, 6)
                         }
                         .buttonStyle(.plain)
+
+                        Divider().padding(.vertical, 4)
                     }
-                    .padding(4)
+
+                    Button(role: .destructive, action: { authManager.signOut() }) {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .frame(width: 24)
+                            Text("Sign Out")
+                            Spacer()
+                        }
+                        .foregroundColor(NimbusColors.error)
+                        .padding(.vertical, 6)
+                    }
+                    .buttonStyle(.plain)
                 }
+                .padding(16)
+                .nimbusCard()
             }
-            .padding(24)
+            .padding(NimbusLayout.contentPadding)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(NimbusColors.warmBg)
@@ -203,14 +197,12 @@ struct AccountView: View {
             .foregroundColor(.white)
             .padding(.horizontal, 12)
             .padding(.vertical, 5)
-            .background(
-                LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing)
-            )
+            .background(NimbusGradients.primary)
             .cornerRadius(14)
         } else {
             Text("FREE")
                 .font(.caption.weight(.bold))
-                .foregroundColor(.secondary)
+                .foregroundColor(NimbusColors.muted)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 5)
                 .background(Color.secondary.opacity(0.1))

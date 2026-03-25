@@ -9,17 +9,11 @@ struct UpgradeView: View {
 
     enum PlanOption { case monthly, annual }
 
-    private let darkText = Color(red: 0.08, green: 0.04, blue: 0.18)
-    private let proGradient = LinearGradient(
-        colors: [Color(red: 0.38, green: 0.20, blue: 0.92), Color(red: 0.55, green: 0.15, blue: 0.98)],
-        startPoint: .leading, endPoint: .trailing
-    )
-
     var body: some View {
         ZStack(alignment: .topTrailing) {
             // Background
             LinearGradient(
-                colors: [Color(red: 0.97, green: 0.96, blue: 1.0), Color.white],
+                colors: [NimbusColors.warmBg, Color.white],
                 startPoint: .top, endPoint: .bottom
             )
             .ignoresSafeArea()
@@ -37,7 +31,7 @@ struct UpgradeView: View {
             Button(action: { dismiss() }) {
                 Image(systemName: "xmark")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(NimbusColors.muted)
                     .padding(7)
                     .background(Color.black.opacity(0.07))
                     .clipShape(Circle())
@@ -45,7 +39,7 @@ struct UpgradeView: View {
             .buttonStyle(.plain)
             .padding(12)
         }
-        .frame(width: 480, height: 640)
+        .frame(width: NimbusLayout.sheetWidth, height: 640)
     }
 
     // MARK: - Header
@@ -54,9 +48,9 @@ struct UpgradeView: View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(proGradient)
+                    .fill(NimbusGradients.primary)
                     .frame(width: 56, height: 56)
-                    .shadow(color: Color.purple.opacity(0.35), radius: 12, x: 0, y: 6)
+                    .shadow(color: NimbusColors.violet.opacity(0.35), radius: 12, x: 0, y: 6)
                 Image(systemName: "waveform")
                     .font(.system(size: 24, weight: .medium))
                     .foregroundColor(.white)
@@ -65,11 +59,11 @@ struct UpgradeView: View {
 
             Text("Unlock NimbusGlide Pro")
                 .font(.system(size: 24, weight: .bold, design: .rounded))
-                .foregroundColor(darkText)
+                .foregroundColor(NimbusColors.heading)
 
             Text("Dictate longer. Speak in any language.\nUnlimited everything.")
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.body)
+                .foregroundColor(NimbusColors.muted)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
         }
@@ -86,14 +80,14 @@ struct UpgradeView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text("Free")
                     .font(.caption.weight(.bold))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(NimbusColors.muted)
                     .frame(width: 80)
                 Text("Pro")
                     .font(.caption.weight(.bold))
                     .foregroundColor(.white)
                     .frame(width: 80)
                     .padding(.vertical, 5)
-                    .background(proGradient)
+                    .background(NimbusGradients.primary)
                     .cornerRadius(6)
             }
             .padding(.horizontal, 40) // 20 outer + 20 inner card padding
@@ -117,7 +111,7 @@ struct UpgradeView: View {
                 comparisonRow(feature: "Auto language detect",free: "xmark",       pro: "checkmark")
             }
             .background(Color.white)
-            .cornerRadius(12)
+            .cornerRadius(NimbusLayout.cardRadius)
             .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 2)
             .padding(.horizontal, 20)
         }
@@ -128,7 +122,7 @@ struct UpgradeView: View {
         HStack(spacing: 0) {
             Text(feature)
                 .font(.callout)
-                .foregroundColor(darkText)
+                .foregroundColor(NimbusColors.heading)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             comparisonCell(value: free, isPro: false)
@@ -146,15 +140,15 @@ struct UpgradeView: View {
         if value == "checkmark" {
             Image(systemName: "checkmark")
                 .font(.caption.weight(.bold))
-                .foregroundColor(isPro ? Color(red: 0.38, green: 0.20, blue: 0.92) : .green)
+                .foregroundColor(isPro ? NimbusColors.indigo : NimbusColors.ready)
         } else if value == "xmark" {
             Image(systemName: "minus")
                 .font(.caption)
-                .foregroundColor(.secondary.opacity(0.5))
+                .foregroundColor(NimbusColors.muted.opacity(0.5))
         } else {
             Text(value)
                 .font(.callout.weight(isPro ? .semibold : .regular))
-                .foregroundColor(isPro ? Color(red: 0.38, green: 0.20, blue: 0.92) : .secondary)
+                .foregroundColor(isPro ? NimbusColors.indigo : NimbusColors.muted)
         }
     }
 
@@ -189,11 +183,11 @@ struct UpgradeView: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .strokeBorder(isSelected ? Color(red: 0.5, green: 0.2, blue: 0.94) : Color.secondary.opacity(0.25), lineWidth: 2)
+                        .strokeBorder(isSelected ? NimbusColors.violet : Color.secondary.opacity(0.25), lineWidth: 2)
                         .frame(width: 20, height: 20)
                     if isSelected {
                         Circle()
-                            .fill(Color(red: 0.5, green: 0.2, blue: 0.94))
+                            .fill(NimbusColors.violet)
                             .frame(width: 10, height: 10)
                     }
                 }
@@ -202,39 +196,39 @@ struct UpgradeView: View {
                     HStack(spacing: 6) {
                         Text(title)
                             .font(.callout.weight(.semibold))
-                            .foregroundColor(darkText)
+                            .foregroundColor(NimbusColors.heading)
                         if let badge {
                             Text(badge)
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 3)
-                                .background(proGradient)
+                                .background(NimbusGradients.primary)
                                 .cornerRadius(5)
                         }
                     }
                     Text(detail)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(NimbusFonts.caption)
+                        .foregroundColor(NimbusColors.muted)
                 }
 
                 Spacer()
 
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
-                    Text(price).font(.title2.weight(.bold)).foregroundColor(darkText)
-                    Text(period).font(.caption).foregroundColor(.secondary)
+                    Text(price).font(.title2.weight(.bold)).foregroundColor(NimbusColors.heading)
+                    Text(period).font(NimbusFonts.caption).foregroundColor(NimbusColors.muted)
                 }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color(red: 0.38, green: 0.20, blue: 0.92).opacity(0.06) : Color.white)
+                RoundedRectangle(cornerRadius: NimbusLayout.cardRadius)
+                    .fill(isSelected ? NimbusColors.indigo.opacity(0.06) : Color.white)
                     .shadow(color: .black.opacity(isSelected ? 0 : 0.04), radius: 4, x: 0, y: 2)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(isSelected ? Color(red: 0.5, green: 0.2, blue: 0.94).opacity(0.55) : Color.secondary.opacity(0.15), lineWidth: 1.5)
+                RoundedRectangle(cornerRadius: NimbusLayout.cardRadius)
+                    .strokeBorder(isSelected ? NimbusColors.violet.opacity(0.55) : Color.secondary.opacity(0.15), lineWidth: 1.5)
             )
         }
         .buttonStyle(.plain)
@@ -246,8 +240,8 @@ struct UpgradeView: View {
         VStack(spacing: 10) {
             if let error = errorMessage {
                 Text(error)
-                    .font(.caption)
-                    .foregroundColor(.red)
+                    .font(NimbusFonts.caption)
+                    .foregroundColor(NimbusColors.error)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
             }
@@ -265,10 +259,10 @@ struct UpgradeView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 13)
-                .background(proGradient)
+                .background(NimbusGradients.primary)
                 .foregroundColor(.white)
-                .cornerRadius(13)
-                .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
+                .cornerRadius(NimbusLayout.cardRadius)
+                .shadow(color: NimbusColors.violet.opacity(0.3), radius: 8, x: 0, y: 4)
             }
             .buttonStyle(.plain)
             .disabled(isLoading)
@@ -278,18 +272,18 @@ struct UpgradeView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.shield.fill")
                         .font(.caption2)
-                        .foregroundColor(.green)
+                        .foregroundColor(NimbusColors.ready)
                     Text("7-day money-back guarantee")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .font(NimbusFonts.small)
+                        .foregroundColor(NimbusColors.muted)
                 }
                 HStack(spacing: 4) {
                     Image(systemName: "bolt.fill")
                         .font(.caption2)
-                        .foregroundColor(.orange)
+                        .foregroundColor(NimbusColors.processing)
                     Text("Cancel anytime")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .font(NimbusFonts.small)
+                        .foregroundColor(NimbusColors.muted)
                 }
             }
             .padding(.bottom, 20)

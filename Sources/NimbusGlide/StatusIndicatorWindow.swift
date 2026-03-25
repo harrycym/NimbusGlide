@@ -171,13 +171,13 @@ struct StatusPillView: View {
         switch pillState.mode {
         case .recording:
             return LinearGradient(
-                colors: [Color(hex: 0x6366F1), Color(hex: 0x8B5CF6)],
+                colors: [NimbusColors.indigo, NimbusColors.violet],
                 startPoint: .leading,
                 endPoint: .trailing
             )
         case .processing:
             return LinearGradient(
-                colors: [Color(hex: 0x8B5CF6), Color(hex: 0x06B6D4)],
+                colors: [NimbusColors.violet, NimbusColors.cyan],
                 startPoint: .leading,
                 endPoint: .trailing
             )
@@ -188,8 +188,8 @@ struct StatusPillView: View {
 
     private var glowColor: Color {
         switch pillState.mode {
-        case .recording: return Color(hex: 0x6366F1)
-        case .processing: return Color(hex: 0x8B5CF6)
+        case .recording: return NimbusColors.indigo
+        case .processing: return NimbusColors.violet
         case .idle: return .clear
         }
     }
@@ -216,7 +216,7 @@ struct StatusPillView: View {
                 RoundedRectangle(cornerRadius: 1.5)
                     .fill(
                         LinearGradient(
-                            colors: [Color(hex: 0x6366F1), Color(hex: 0x8B5CF6)],
+                            colors: [NimbusColors.indigo, NimbusColors.violet],
                             startPoint: .bottom,
                             endPoint: .top
                         )
@@ -242,7 +242,7 @@ struct StatusPillView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color(hex: 0x8B5CF6), Color(hex: 0x06B6D4)],
+                            colors: [NimbusColors.violet, NimbusColors.cyan],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -265,16 +265,3 @@ struct StatusPillView: View {
     }
 }
 
-// MARK: - Hex color helper
-
-extension Color {
-    init(hex: UInt, alpha: Double = 1.0) {
-        self.init(
-            .sRGB,
-            red: Double((hex >> 16) & 0xFF) / 255,
-            green: Double((hex >> 8) & 0xFF) / 255,
-            blue: Double(hex & 0xFF) / 255,
-            opacity: alpha
-        )
-    }
-}

@@ -34,18 +34,18 @@ struct ProfilesView: View {
                 HStack {
                     Button(action: handleAddProfile) {
                         Label("Add Profile", systemImage: "plus")
-                            .font(.caption)
+                            .font(NimbusFonts.caption)
                     }
                     .buttonStyle(.plain)
                     Spacer()
                     if !usageTracker.isPro {
                         Text("\(profileManager.profiles.count)/\(ProfileManager.freeProfileLimit)")
-                            .font(.caption)
-                            .foregroundColor(profileManager.profiles.count >= ProfileManager.freeProfileLimit ? .orange : .secondary)
+                            .font(NimbusFonts.caption)
+                            .foregroundColor(profileManager.profiles.count >= ProfileManager.freeProfileLimit ? NimbusColors.processing : NimbusColors.muted)
                     } else {
                         Text("\(profileManager.profiles.count) profiles")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .font(NimbusFonts.caption)
+                            .foregroundColor(NimbusColors.muted)
                     }
                 }
                 .padding(8)
@@ -68,10 +68,10 @@ struct ProfilesView: View {
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "person.crop.circle")
-                        .font(.system(size: 40))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: NimbusLayout.emptyStateIconSize, weight: .light))
+                        .foregroundStyle(NimbusGradients.primary)
                     Text("Select a profile to edit")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(NimbusColors.muted)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -92,6 +92,7 @@ struct ProfilesView: View {
                 selectedProfileId = profileManager.activeProfileId ?? profileManager.profiles.first?.id
             }
         }
+        .background(NimbusColors.warmBg)
     }
 
     private func handleAddProfile() {
@@ -115,15 +116,15 @@ private struct ProfileRow: View {
                 Text(profile.name)
                     .font(.body.weight(isActive ? .semibold : .regular))
                 Text(profile.instructions)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.caption)
+                    .foregroundColor(NimbusColors.muted)
                     .lineLimit(1)
             }
             Spacer()
             if isActive {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.accentColor)
-                    .font(.caption)
+                    .foregroundColor(NimbusColors.indigo)
+                    .font(NimbusFonts.caption)
             }
         }
         .padding(.vertical, 2)
@@ -149,7 +150,7 @@ private struct ProfileEditor: View {
                 if isActive {
                     Label("Active", systemImage: "checkmark.circle.fill")
                         .font(.callout.weight(.medium))
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(NimbusColors.indigo)
                 } else {
                     Button("Set Active") { onSetActive() }
                         .buttonStyle(.bordered)
@@ -161,7 +162,7 @@ private struct ProfileEditor: View {
                         .font(.callout)
                 }
                 .buttonStyle(.plain)
-                .foregroundColor(.red.opacity(0.7))
+                .foregroundColor(NimbusColors.error.opacity(0.7))
                 .help("Delete this profile")
                 .alert("Delete \"\(profile.name)\"?", isPresented: $showDeleteConfirm) {
                     Button("Delete", role: .destructive) { onDelete() }
@@ -173,10 +174,10 @@ private struct ProfileEditor: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Instructions")
-                    .font(.headline)
+                    .font(NimbusFonts.sectionHeader)
                 Text("Tell NimbusGlide how to process dictations with this profile.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.caption)
+                    .foregroundColor(NimbusColors.muted)
             }
 
             TextEditor(text: $profile.instructions)
@@ -219,7 +220,7 @@ private struct AddProfileView: View {
                     .font(.subheadline.weight(.medium))
                 Text("Tell NimbusGlide how to format your dictation with this profile.")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(NimbusColors.muted)
                 TextEditor(text: $instructions)
                     .frame(height: 120)
                     .overlay(
@@ -242,6 +243,6 @@ private struct AddProfileView: View {
             }
         }
         .padding(24)
-        .frame(width: 420, height: 340)
+        .frame(width: NimbusLayout.sheetWidth, height: 340)
     }
 }

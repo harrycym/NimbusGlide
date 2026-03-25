@@ -18,15 +18,15 @@ struct HistoryView: View {
             // Header
             HStack {
                 Text("\(memoryManager.entries.count) dictations")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.caption)
+                    .foregroundColor(NimbusColors.muted)
                 Spacer()
                 if !memoryManager.entries.isEmpty {
                     Button("Clear All") {
                         memoryManager.clearAll()
                     }
-                    .font(.caption)
-                    .foregroundColor(.red)
+                    .font(NimbusFonts.caption)
+                    .foregroundColor(NimbusColors.error)
                     .buttonStyle(.plain)
                 }
             }
@@ -54,20 +54,21 @@ struct HistoryView: View {
             }
         }
         .searchable(text: $searchText, prompt: "Search dictations")
+        .background(NimbusColors.warmBg)
     }
 
     private var emptyState: some View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
+                .font(.system(size: NimbusLayout.emptyStateIconSize, weight: .light))
+                .foregroundStyle(NimbusGradients.primary)
             Text("No dictation history")
-                .font(.headline)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.sectionHeader)
+                .foregroundColor(NimbusColors.muted)
             Text("Your transcriptions will appear here\nafter your first dictation.")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.caption)
+                .foregroundColor(NimbusColors.muted)
                 .multilineTextAlignment(.center)
             Spacer()
         }
@@ -85,37 +86,36 @@ private struct HistoryRow: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(entry.timestamp, style: .relative)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.small)
+                    .foregroundColor(NimbusColors.muted)
                 Text("ago")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.small)
+                    .foregroundColor(NimbusColors.muted)
                 Spacer()
                 Button(action: copyText) {
                     Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                        .font(.caption)
-                        .foregroundColor(copied ? .green : .secondary)
+                        .font(NimbusFonts.caption)
+                        .foregroundColor(copied ? NimbusColors.ready : NimbusColors.muted)
                 }
                 .buttonStyle(.plain)
                 .help("Copy result")
             }
 
             Text(entry.rawTranscript)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.caption)
+                .foregroundColor(NimbusColors.muted)
                 .lineLimit(2)
 
             Text(entry.polishedText)
-                .font(.callout)
+                .font(NimbusFonts.body)
                 .lineLimit(3)
         }
         .padding(.vertical, 4)
     }
 
     private func copyText() {
-        let debugText = "Raw Input:\n\(entry.rawTranscript)\n\nFormatted Output:\n\(entry.polishedText)"
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(debugText, forType: .string)
+        NSPasteboard.general.setString(entry.polishedText, forType: .string)
         copied = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
     }

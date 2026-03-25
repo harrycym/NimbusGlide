@@ -4,8 +4,8 @@ import Combine
 
 enum PipelineStatus: String {
     case idle = "Ready"
-    case recording = "Recording"
-    case processing = "Processing"
+    case recording = "Listening"
+    case processing = "Thinking"
     case error = "Error"
 }
 

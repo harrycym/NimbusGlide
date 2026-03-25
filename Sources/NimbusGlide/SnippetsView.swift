@@ -67,10 +67,10 @@ struct SnippetsView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Snippets")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(NimbusFonts.pageTitle)
                         .foregroundColor(NimbusColors.heading)
                     Text("Say a trigger phrase during dictation and NimbusGlide will expand it into the full text automatically.")
-                        .font(.system(size: 12))
+                        .font(NimbusFonts.caption)
                         .foregroundColor(NimbusColors.muted)
                         .lineSpacing(2)
                 }
@@ -107,10 +107,10 @@ struct SnippetsView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("\"\(snippet.trigger)\"")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(NimbusFonts.bodyMedium)
                                     .foregroundColor(NimbusColors.violet)
                                 Text(snippet.expansion)
-                                    .font(.system(size: 14))
+                                    .font(NimbusFonts.body)
                                     .foregroundColor(NimbusColors.body)
                                     .lineLimit(2)
                             }
@@ -121,8 +121,8 @@ struct SnippetsView: View {
                                 }
                             }) {
                                 Image(systemName: "trash")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.red.opacity(0.6))
+                                    .font(NimbusFonts.body)
+                                    .foregroundColor(NimbusColors.error.opacity(0.6))
                             }
                             .buttonStyle(.plain)
                         }
@@ -153,14 +153,14 @@ private struct AddSnippetView: View {
     var body: some View {
         VStack(spacing: 16) {
             Text("New Snippet")
-                .font(.headline)
+                .font(NimbusFonts.sectionHeader)
 
             TextField("Trigger phrase (e.g. \"my email\")", text: $trigger)
                 .textFieldStyle(.roundedBorder)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Expansion")
-                    .font(.subheadline)
+                    .font(NimbusFonts.bodyMedium)
                 TextEditor(text: $expansion)
                     .frame(height: 80)
                     .overlay(
@@ -182,7 +182,7 @@ private struct AddSnippetView: View {
                 .disabled(trigger.isEmpty || expansion.isEmpty)
             }
         }
-        .padding(20)
-        .frame(width: 400, height: 260)
+        .padding(NimbusLayout.contentPadding)
+        .frame(width: NimbusLayout.sheetWidth, height: 260)
     }
 }

@@ -11,124 +11,120 @@ struct AppSettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 // Hotkey
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Hotkey", systemImage: "keyboard")
-                            .font(.system(size: 15, weight: .semibold))
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Hotkey", systemImage: "keyboard")
+                        .font(NimbusFonts.sectionHeader)
 
-                        Text("Hold this key to dictate, release to process.")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
+                    Text("Hold this key to dictate, release to process.")
+                        .font(NimbusFonts.caption)
+                        .foregroundColor(NimbusColors.muted)
 
-                        Picker("", selection: $settingsManager.hotkey) {
-                            ForEach(HotkeyChoice.allCases) { choice in
-                                Text(choice.rawValue).tag(choice)
-                            }
-                        }
-                        .pickerStyle(.radioGroup)
-                        .labelsHidden()
-
-                        if settingsManager.hotkey == .custom {
-                            HotkeyRecorderRow()
-                                .environmentObject(settingsManager)
+                    Picker("", selection: $settingsManager.hotkey) {
+                        ForEach(HotkeyChoice.allCases) { choice in
+                            Text(choice.rawValue).tag(choice)
                         }
                     }
-                    .padding(4)
+                    .pickerStyle(.radioGroup)
+                    .labelsHidden()
+
+                    if settingsManager.hotkey == .custom {
+                        HotkeyRecorderRow()
+                            .environmentObject(settingsManager)
+                    }
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // Permissions
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Permissions", systemImage: "lock.shield")
-                            .font(.system(size: 15, weight: .semibold))
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Permissions", systemImage: "lock.shield")
+                        .font(NimbusFonts.sectionHeader)
 
-                        PermissionRow(
-                            name: "Microphone",
-                            icon: "mic.fill",
-                            granted: pipelineState.isMicrophoneAuthorized
-                        ) {
-                            NSWorkspace.shared.open(
-                                URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
-                            )
-                        }
-
-                        PermissionRow(
-                            name: "Accessibility",
-                            icon: "accessibility",
-                            granted: pipelineState.isAccessibilityAuthorized,
-                            hint: "If listed but not working, toggle it off and on"
-                        ) {
-                            PermissionsManager.checkAccessibilityAccess()
-                            NSWorkspace.shared.open(
-                                URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-                            )
-                        }
+                    PermissionRow(
+                        name: "Microphone",
+                        icon: "mic.fill",
+                        granted: pipelineState.isMicrophoneAuthorized
+                    ) {
+                        NSWorkspace.shared.open(
+                            URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
+                        )
                     }
-                    .padding(4)
+
+                    PermissionRow(
+                        name: "Accessibility",
+                        icon: "accessibility",
+                        granted: pipelineState.isAccessibilityAuthorized,
+                        hint: "If listed but not working, toggle it off and on"
+                    ) {
+                        PermissionsManager.checkAccessibilityAccess()
+                        NSWorkspace.shared.open(
+                            URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+                        )
+                    }
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // Appearance
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Appearance", systemImage: "paintbrush")
-                            .font(.system(size: 15, weight: .semibold))
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Appearance", systemImage: "paintbrush")
+                        .font(NimbusFonts.sectionHeader)
 
-                        Toggle(isOn: $settingsManager.showStatusIndicator) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Floating status indicator")
-                                    .font(.system(size: 14))
-                                Text("Shows a small pill at the bottom center when recording or processing")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                            }
+                    Toggle(isOn: $settingsManager.showStatusIndicator) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Floating status indicator")
+                                .font(NimbusFonts.body)
+                            Text("Shows a small pill at the bottom center when recording or processing")
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.muted)
                         }
                     }
-                    .padding(4)
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // Language
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Language", systemImage: "globe")
-                            .font(.system(size: 15, weight: .semibold))
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Language", systemImage: "globe")
+                        .font(NimbusFonts.sectionHeader)
 
-                        if usageTracker.isPro {
-                            Text("Select which languages the AI may respond in. Multi-language support auto-detects and responds in the matching language.")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                        } else {
-                            Text("Choose your dictation language. You can switch anytime — free tier supports one language at a time. Upgrade to Pro for multi-language.")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                        }
+                    if usageTracker.isPro {
+                        Text("Select which languages the AI may respond in. Multi-language support auto-detects and responds in the matching language.")
+                            .font(NimbusFonts.caption)
+                            .foregroundColor(NimbusColors.muted)
+                    } else {
+                        Text("Choose your dictation language. You can switch anytime — free tier supports one language at a time. Upgrade to Pro for multi-language.")
+                            .font(NimbusFonts.caption)
+                            .foregroundColor(NimbusColors.muted)
+                    }
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 170), alignment: .leading)], spacing: 6) {
-                            ForEach(SettingsManager.supportedLanguages, id: \.self) { language in
-                                Toggle(language, isOn: Binding(
-                                    get: { settingsManager.selectedLanguages.contains(language) },
-                                    set: { isOn in
-                                        if isOn {
-                                            if usageTracker.isPro {
-                                                // Pro: add language
-                                                settingsManager.selectedLanguages.append(language)
-                                            } else {
-                                                // Free: swap to this language (only 1 allowed)
-                                                settingsManager.selectedLanguages = [language]
-                                            }
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 170), alignment: .leading)], spacing: 6) {
+                        ForEach(SettingsManager.supportedLanguages, id: \.self) { language in
+                            Toggle(language, isOn: Binding(
+                                get: { settingsManager.selectedLanguages.contains(language) },
+                                set: { isOn in
+                                    if isOn {
+                                        if usageTracker.isPro {
+                                            // Pro: add language
+                                            settingsManager.selectedLanguages.append(language)
                                         } else {
-                                            if usageTracker.isPro {
-                                                settingsManager.selectedLanguages.removeAll { $0 == language }
-                                            }
-                                            // Free: don't allow deselecting the only language
+                                            // Free: swap to this language (only 1 allowed)
+                                            settingsManager.selectedLanguages = [language]
                                         }
+                                    } else {
+                                        if usageTracker.isPro {
+                                            settingsManager.selectedLanguages.removeAll { $0 == language }
+                                        }
+                                        // Free: don't allow deselecting the only language
                                     }
-                                ))
-                                .font(.system(size: 14))
-                            }
+                                }
+                            ))
+                            .font(NimbusFonts.body)
                         }
                     }
-                    .padding(4)
                 }
+                .padding(16)
+                .nimbusCard()
                 .alert("Multi-language is a Pro feature", isPresented: $showLanguageUpgradeAlert) {
                     Button("Upgrade to Pro") {
                         // Navigate to account/upgrade
@@ -140,44 +136,43 @@ struct AppSettingsView: View {
                 }
 
                 // Usage
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Usage", systemImage: "chart.bar")
-                            .font(.system(size: 15, weight: .semibold))
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("Usage", systemImage: "chart.bar")
+                        .font(NimbusFonts.sectionHeader)
 
-                        HStack {
-                            Text("\(usageTracker.totalWordsUsed.formatted()) words used")
-                                .font(.system(size: 14))
-                            Spacer()
-                            if usageTracker.isPro {
-                                Label("Pro", systemImage: "checkmark.seal.fill")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.accentColor)
-                            } else if let limit = usageTracker.wordLimit {
-                                Text("\(max(0, limit - usageTracker.totalWordsUsed).formatted()) remaining")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-
-                        if !usageTracker.isPro {
-                            ProgressView(value: usageTracker.usageRatio)
-                                .tint(usageTracker.usageRatio > 0.8 ? .orange : .accentColor)
+                    HStack {
+                        Text("\(usageTracker.totalWordsUsed.formatted()) words used")
+                            .font(NimbusFonts.body)
+                        Spacer()
+                        if usageTracker.isPro {
+                            Label("Pro", systemImage: "checkmark.seal.fill")
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.indigo)
+                        } else if let limit = usageTracker.wordLimit {
+                            Text("\(max(0, limit - usageTracker.totalWordsUsed).formatted()) remaining")
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.muted)
                         }
                     }
-                    .padding(4)
+
+                    if !usageTracker.isPro {
+                        ProgressView(value: usageTracker.usageRatio)
+                            .tint(usageTracker.usageRatio > 0.8 ? NimbusColors.processing : NimbusColors.indigo)
+                    }
                 }
+                .padding(16)
+                .nimbusCard()
 
                 // About & Updates
-                GroupBox {
+                VStack {
                     // About
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("NimbusGlide")
-                                .font(.system(size: 14, weight: .medium))
+                                .font(NimbusFonts.bodyMedium)
                             Text("Version \(UpdateChecker.currentVersion)")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.muted)
                         }
                         Spacer()
                         Button("Check for Updates") {
@@ -186,10 +181,11 @@ struct AppSettingsView: View {
                         .disabled(!updateChecker.canCheckForUpdates)
                         .buttonStyle(.borderedProminent)
                     }
-                    .padding(4)
                 }
+                .padding(16)
+                .nimbusCard()
             }
-            .padding(20)
+            .padding(NimbusLayout.contentPadding)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(NimbusColors.warmBg)

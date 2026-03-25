@@ -25,7 +25,7 @@ struct NimbusGlideApp: App {
         .defaultSize(width: 960, height: 680)
 
         Settings {
-            SettingsView()
+            AppSettingsView()
                 .environmentObject(appDelegate.profileManager)
                 .environmentObject(appDelegate.memoryManager)
                 .environmentObject(appDelegate.settingsManager)

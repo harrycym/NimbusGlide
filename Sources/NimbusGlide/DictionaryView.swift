@@ -73,10 +73,10 @@ struct DictionaryView: View {
             // Header
             VStack(alignment: .leading, spacing: 6) {
                 Text("Dictionary")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(NimbusFonts.pageTitle)
                     .foregroundColor(NimbusColors.heading)
                 Text("Add words and phrases that NimbusGlide frequently gets wrong. These corrections are applied automatically after every dictation.")
-                    .font(.system(size: 12))
+                    .font(NimbusFonts.caption)
                     .foregroundColor(NimbusColors.muted)
                     .lineSpacing(2)
             }
@@ -124,14 +124,14 @@ struct DictionaryView: View {
                     ForEach(dictionaryManager.entries) { entry in
                         HStack {
                             Text(entry.wrong)
-                                .font(.system(size: 14))
+                                .font(NimbusFonts.body)
                                 .foregroundColor(NimbusColors.error)
                                 .strikethrough()
                             Image(systemName: "arrow.right")
-                                .font(.system(size: 12))
+                                .font(NimbusFonts.caption)
                                 .foregroundColor(NimbusColors.muted)
                             Text(entry.correct)
-                                .font(.system(size: 14, weight: .medium))
+                                .font(NimbusFonts.bodyMedium)
                                 .foregroundColor(NimbusColors.ready)
                             Spacer()
                             Button(action: {
@@ -140,8 +140,8 @@ struct DictionaryView: View {
                                 }
                             }) {
                                 Image(systemName: "trash")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.red.opacity(0.6))
+                                    .font(NimbusFonts.body)
+                                    .foregroundColor(NimbusColors.error.opacity(0.6))
                             }
                             .buttonStyle(.plain)
                         }

@@ -118,7 +118,7 @@ struct HomeView: View {
                 StatBadge(
                     icon: "bolt.fill",
                     color: NimbusColors.cyan,
-                    value: "160",
+                    value: "\u{2014}",
                     label: "WPM"
                 )
                 Spacer()
@@ -147,19 +147,19 @@ struct HomeView: View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Hold ")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(NimbusFonts.sectionHeader)
                     .foregroundColor(.white)
                 +
                 Text(hotkeyDisplay)
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundColor(.white)
                 +
-                Text(" → to dictate and let NimbusGlide format for you")
-                    .font(.system(size: 17, weight: .semibold))
+                Text(" \u{2192} to dictate and let NimbusGlide format for you")
+                    .font(NimbusFonts.sectionHeader)
                     .foregroundColor(.white)
 
                 Text("Press and hold \(hotkeyDisplay) to dictate in any app. NimbusGlide's Smart Formatting will handle punctuation, new lines, lists, and adjust when you change your mind mid-sentence.")
-                    .font(.system(size: 13))
+                    .font(NimbusFonts.caption)
                     .foregroundColor(.white.opacity(0.8))
                     .lineSpacing(2)
 
@@ -478,7 +478,6 @@ struct DictationRow: View {
                     .foregroundColor(copied ? NimbusColors.ready : NimbusColors.muted)
             }
             .buttonStyle(.plain)
-            .opacity(0.7)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)

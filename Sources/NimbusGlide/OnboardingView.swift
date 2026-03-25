@@ -12,7 +12,7 @@ struct OnboardingView: View {
             HStack(spacing: 8) {
                 ForEach(0..<totalSteps, id: \.self) { step in
                     Circle()
-                        .fill(step <= currentStep ? Color.accentColor : Color.secondary.opacity(0.3))
+                        .fill(step <= currentStep ? NimbusColors.indigo : NimbusColors.muted.opacity(0.3))
                         .frame(width: 8, height: 8)
                 }
             }
@@ -55,7 +55,7 @@ struct OnboardingView: View {
             }
             .padding(24)
         }
-        .frame(width: 480, height: 380)
+        .frame(width: NimbusLayout.sheetWidth, height: 380)
     }
 
     // MARK: - Steps
@@ -64,14 +64,14 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Image(systemName: "waveform")
                 .font(.system(size: 56, weight: .light))
-                .foregroundColor(.accentColor)
+                .foregroundStyle(NimbusGradients.primary)
 
             Text("Welcome to NimbusGlide")
                 .font(.largeTitle.weight(.bold))
 
             Text("Speak naturally. Get polished text.\nPasted right where you need it.")
-                .font(.body)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.body)
+                .foregroundColor(NimbusColors.muted)
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)
 
@@ -89,14 +89,14 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Image(systemName: "lock.open.fill")
                 .font(.system(size: 40, weight: .light))
-                .foregroundColor(.accentColor)
+                .foregroundStyle(NimbusGradients.primary)
 
             Text("Quick Setup")
                 .font(.title2.weight(.semibold))
 
             Text("NimbusGlide needs two permissions to work.\nThis only takes a moment.")
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.body)
+                .foregroundColor(NimbusColors.muted)
                 .multilineTextAlignment(.center)
 
             VStack(spacing: 12) {
@@ -133,10 +133,10 @@ struct OnboardingView: View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .frame(width: 20)
-                .foregroundColor(.accentColor)
+                .foregroundStyle(NimbusGradients.primary)
             Text(text)
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.body)
+                .foregroundColor(NimbusColors.muted)
         }
     }
 }

@@ -11,14 +11,14 @@ struct HotkeyRecorderRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Text("Current Key:")
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(NimbusFonts.body)
+                .foregroundColor(NimbusColors.muted)
 
             Text(settingsManager.customKeyLabel)
                 .font(.system(.body, design: .monospaced).weight(.semibold))
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(Color.secondary.opacity(0.15))
+                .background(NimbusColors.sidebarBg)
                 .cornerRadius(6)
 
             Spacer()
@@ -27,7 +27,7 @@ struct HotkeyRecorderRow: View {
                 if isRecording { stopRecording() } else { startRecording() }
             }
             .buttonStyle(.borderedProminent)
-            .tint(isRecording ? .red : .accentColor)
+            .tint(isRecording ? NimbusColors.recording : NimbusColors.indigo)
         }
         .onDisappear { stopRecording() }
     }

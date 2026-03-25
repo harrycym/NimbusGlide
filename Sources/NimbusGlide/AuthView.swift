@@ -16,29 +16,26 @@ struct AuthView: View {
                 VStack(spacing: 14) {
                     ZStack {
                         Circle()
-                            .fill(
-                                LinearGradient(colors: [.purple.opacity(0.15), .blue.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                            )
+                            .fill(NimbusGradients.subtle)
                             .frame(width: 80, height: 80)
                         Image(systemName: "waveform")
                             .font(.system(size: 36, weight: .light))
-                            .foregroundStyle(
-                                LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                            )
+                            .foregroundStyle(NimbusGradients.primary)
                     }
 
                     Text("NimbusGlide")
                         .font(.largeTitle.weight(.bold))
+                        .foregroundColor(NimbusColors.heading)
 
                     if authManager.emailAuthState == .needsVerification {
                         Text("Check your email for a verification code.")
-                            .font(.callout)
-                            .foregroundColor(.secondary)
+                            .font(NimbusFonts.body)
+                            .foregroundColor(NimbusColors.muted)
                             .multilineTextAlignment(.center)
                     } else {
                         Text("AI dictation that thinks.\nSpeak naturally, get polished text.")
-                            .font(.callout)
-                            .foregroundColor(.secondary)
+                            .font(NimbusFonts.body)
+                            .foregroundColor(NimbusColors.muted)
                             .multilineTextAlignment(.center)
                             .lineSpacing(2)
                     }
@@ -48,8 +45,8 @@ struct AuthView: View {
                     // OTP Verification screen
                     VStack(spacing: 14) {
                         Text("We sent a 6-digit code to")
-                            .font(.callout)
-                            .foregroundColor(.secondary)
+                            .font(NimbusFonts.body)
+                            .foregroundColor(NimbusColors.muted)
                         Text(email)
                             .font(.callout.weight(.semibold))
 
@@ -78,8 +75,8 @@ struct AuthView: View {
                             authManager.errorMessage = nil
                             otpCode = ""
                         }
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
+                        .font(NimbusFonts.caption)
+                        .foregroundColor(NimbusColors.indigo)
                     }
                     .disabled(authManager.isLoading)
                 } else {
@@ -101,11 +98,11 @@ struct AuthView: View {
 
                         // Divider
                         HStack(spacing: 12) {
-                            Rectangle().fill(Color.secondary.opacity(0.15)).frame(height: 1)
+                            Rectangle().fill(NimbusColors.muted.opacity(0.15)).frame(height: 1)
                             Text("or")
-                                .font(.caption)
-                                .foregroundColor(.secondary.opacity(0.7))
-                            Rectangle().fill(Color.secondary.opacity(0.15)).frame(height: 1)
+                                .font(NimbusFonts.caption)
+                                .foregroundColor(NimbusColors.muted.opacity(0.7))
+                            Rectangle().fill(NimbusColors.muted.opacity(0.15)).frame(height: 1)
                         }
                         .frame(maxWidth: 300)
 
@@ -134,8 +131,8 @@ struct AuthView: View {
                                 .disabled(email.isEmpty || password.count < 6)
 
                                 Text("New? Enter email + password to create an account.\nExisting? Just sign in.")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
+                                    .font(NimbusFonts.small)
+                                    .foregroundColor(NimbusColors.muted)
                                     .multilineTextAlignment(.center)
                                     .frame(maxWidth: 280)
                             }
@@ -164,8 +161,8 @@ struct AuthView: View {
 
                 if let error = authManager.errorMessage {
                     Text(error)
-                        .font(.caption)
-                        .foregroundColor(.red)
+                        .font(NimbusFonts.caption)
+                        .foregroundColor(NimbusColors.error)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
                 }
@@ -175,19 +172,19 @@ struct AuthView: View {
 
             HStack(spacing: 4) {
                 Text("Free to start")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                Circle().fill(Color.secondary.opacity(0.3)).frame(width: 3, height: 3)
+                    .font(NimbusFonts.small)
+                    .foregroundColor(NimbusColors.muted)
+                Circle().fill(NimbusColors.muted.opacity(0.3)).frame(width: 3, height: 3)
                 Text("2,000 words/month")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                Circle().fill(Color.secondary.opacity(0.3)).frame(width: 3, height: 3)
+                    .font(NimbusFonts.small)
+                    .foregroundColor(NimbusColors.muted)
+                Circle().fill(NimbusColors.muted.opacity(0.3)).frame(width: 3, height: 3)
                 Text("Pro from $3/mo")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .font(NimbusFonts.small)
+                    .foregroundColor(NimbusColors.muted)
             }
             .padding(.bottom, 16)
         }
-        .frame(width: 480, height: 540)
+        .frame(width: NimbusLayout.sheetWidth, height: 540)
     }
 }

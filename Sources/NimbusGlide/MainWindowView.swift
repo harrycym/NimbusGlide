@@ -82,7 +82,7 @@ struct MainWindowView: View {
                     .font(.title2)
                     .foregroundStyle(NimbusGradients.primary)
                 Text("NimbusGlide")
-                    .font(.system(size: 15, weight: .bold))
+                    .font(NimbusFonts.sectionHeader)
                     .foregroundColor(NimbusColors.heading)
 
                 if usageTracker.isPro {
@@ -96,9 +96,9 @@ struct MainWindowView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
+            .padding(.horizontal, NimbusLayout.spacing16)
+            .padding(.top, NimbusLayout.spacing12)
+            .padding(.bottom, NimbusLayout.spacing8)
 
             List(selection: $selectedItem) {
                 ForEach(SidebarItem.topItems) { item in
@@ -111,28 +111,14 @@ struct MainWindowView: View {
             Spacer()
 
             // Bottom items — Settings & Account pinned above usage meter
-            VStack(spacing: 2) {
+            List(selection: $selectedItem) {
                 ForEach(SidebarItem.bottomItems) { item in
-                    Button(action: { selectedItem = item }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: item.icon)
-                                .font(.system(size: 14))
-                                .frame(width: 22)
-                            Text(item.rawValue)
-                                .font(.system(size: 14))
-                            Spacer()
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
-                        .background(selectedItem == item ? Color.accentColor.opacity(0.15) : Color.clear)
-                        .cornerRadius(6)
-                        .foregroundColor(selectedItem == item ? .accentColor : .primary)
-                    }
-                    .buttonStyle(.plain)
+                    Label(item.rawValue, systemImage: item.icon)
+                        .tag(item)
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.bottom, 4)
+            .listStyle(.sidebar)
+            .frame(height: 72)
 
             Divider()
 
@@ -142,8 +128,8 @@ struct MainWindowView: View {
 
             // Status pill
             StatusPill(status: pipelineState.status)
-                .padding(.horizontal, 12)
-                .padding(.bottom, 12)
+                .padding(.horizontal, NimbusLayout.spacing12)
+                .padding(.bottom, NimbusLayout.spacing12)
         }
         .navigationSplitViewColumnWidth(min: 170, ideal: NimbusLayout.sidebarWidth, max: 230)
     }

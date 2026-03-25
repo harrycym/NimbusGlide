@@ -60,8 +60,20 @@ enum NimbusGradients {
 enum NimbusLayout {
     static let cardRadius: CGFloat = 14
     static let buttonRadius: CGFloat = 24
+    static let buttonSmallRadius: CGFloat = 8
     static let sidebarWidth: CGFloat = 190
     static let contentPadding: CGFloat = 32
+    static let sheetWidth: CGFloat = 480
+    static let emptyStateIconSize: CGFloat = 32
+
+    // Spacing scale
+    static let spacing4: CGFloat = 4
+    static let spacing6: CGFloat = 6
+    static let spacing8: CGFloat = 8
+    static let spacing12: CGFloat = 12
+    static let spacing16: CGFloat = 16
+    static let spacing20: CGFloat = 20
+    static let spacing24: CGFloat = 24
 }
 
 // MARK: - Typography
@@ -89,5 +101,19 @@ struct NimbusCard: ViewModifier {
 extension View {
     func nimbusCard() -> some View {
         modifier(NimbusCard())
+    }
+}
+
+// MARK: - Hex Color Helper
+
+extension Color {
+    init(hex: UInt, alpha: Double = 1.0) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255,
+            opacity: alpha
+        )
     }
 }
