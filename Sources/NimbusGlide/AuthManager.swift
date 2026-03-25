@@ -152,7 +152,16 @@ class AuthManager: NSObject, ObservableObject {
             } catch {
                 await MainActor.run {
                     self.isLoading = false
-                    self.errorMessage = error.localizedDescription
+                    let msg = error.localizedDescription
+                    if msg.contains("rate") || msg.contains("429") {
+                        self.errorMessage = "Too many attempts. Please wait a minute and try again."
+                    } else if msg.contains("credentials") || msg.contains("password") {
+                        self.errorMessage = "Incorrect password for this email."
+                    } else if msg.contains("network") || msg.contains("timed out") {
+                        self.errorMessage = "Connection failed. Check your internet and try again."
+                    } else {
+                        self.errorMessage = msg
+                    }
                     self.clearPendingCredentials()
                 }
             }
@@ -187,10 +196,14 @@ class AuthManager: NSObject, ObservableObject {
                     let body = String(data: data, encoding: .utf8) ?? ""
                     await MainActor.run {
                         self.isLoading = false
-                        if body.contains("expired") {
-                            self.errorMessage = "Code expired. Please sign up again."
+                        if body.contains("expired") || body.contains("otp_expired") {
+                            self.errorMessage = "Code expired. Tap 'Back' and sign up again to get a new code."
+                        } else if body.contains("rate") || body.contains("429") {
+                            self.errorMessage = "Too many attempts. Please wait a minute and try again."
+                        } else if body.contains("not found") || body.contains("no user") {
+                            self.errorMessage = "Account not found. Please sign up first."
                         } else {
-                            self.errorMessage = "Invalid verification code."
+                            self.errorMessage = "Invalid code. Check your email and try again."
                         }
                     }
                     return
@@ -439,13 +452,20 @@ class AuthManager: NSObject, ObservableObject {
     // MARK: - Token Management
 
     /// Returns a valid access token, refreshing if needed.
+    /// If tokens are missing or refresh fails, auto-clears session so the UI shows sign-in.
     func validAccessToken() async throws -> String {
         guard let accessToken = KeychainHelper.load(key: Self.accessTokenKey),
               let refreshToken = KeychainHelper.load(key: Self.refreshTokenKey) else {
+            await MainActor.run { self.clearSession() }
             throw AuthError.notAuthenticated
         }
 
-        return try await refreshTokenIfNeeded(accessToken: accessToken, refreshToken: refreshToken)
+        do {
+            return try await refreshTokenIfNeeded(accessToken: accessToken, refreshToken: refreshToken)
+        } catch {
+            await MainActor.run { self.clearSession() }
+            throw AuthError.tokenRefreshFailed
+        }
     }
 
     private func refreshTokenIfNeeded(accessToken: String, refreshToken: String) async throws -> String {
