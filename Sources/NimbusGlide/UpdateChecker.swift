@@ -27,7 +27,6 @@ class UpdateChecker: ObservableObject {
     }
 
     func checkForUpdates() {
-        NSApp.activate(ignoringOtherApps: true)
         updaterController.checkForUpdates(nil)
     }
 }
